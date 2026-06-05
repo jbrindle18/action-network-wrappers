@@ -66,20 +66,57 @@
   .btn.ok{background:var(--g-ok)!important;border-color:var(--g-ok)!important;color:#fff!important}
   .status{font-size:12px;color:var(--g-mut)}
 
-  main{min-height:0;overflow:auto}
+  main{min-height:0;overflow:hidden;display:flex;align-items:stretch}
+  .form-scroll{flex:1 1 auto;min-width:0;overflow:auto}
   .form-pane{
     background:var(--g-panel);padding:0 0 60px;
     max-width:600px;margin:0 auto;width:100%;
     border-left:1px solid var(--g-line);border-right:1px solid var(--g-line);min-height:100%;
   }
 
+  /* ---- Left sidebar: section navigator -------------------------------- */
+  .sidebar{
+    flex:0 0 240px;overflow:auto;background:var(--g-panel);
+    border-right:2px solid var(--g-ink);display:flex;flex-direction:column;
+  }
+  .side-h{
+    font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--g-ink);margin:0 0 11px;
+  }
+  .side-status{padding:18px 16px;border-bottom:1px solid var(--g-line)}
+  .side-ready{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--g-text)}
+  .side-ready .dot-ok{width:8px;height:8px;border-radius:50%;background:var(--g-ok);flex:0 0 auto}
+  .side-ready.is-loading .dot-ok{background:var(--g-mut)}
+  .side-nav{padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+  .side-nav .side-h{padding:0 4px}
+  .snav-item{
+    display:flex;align-items:center;gap:9px;padding:8px 10px;cursor:pointer;
+    color:var(--g-mut);text-decoration:none;border:1px solid transparent;
+    font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;
+  }
+  .snav-item:hover{background:var(--g-bg);color:var(--g-ink)}
+  .snav-item.active{background:var(--g-yellow);color:var(--g-ink);border-color:var(--g-ink)}
+  .snav-num{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;font-size:11px;flex:0 0 auto}
+  .snav-label{flex:1}
+  .side-foot{margin-top:auto;padding:16px 16px 18px;border-top:1px solid var(--g-line)}
+  .side-quote{font-size:11px;color:var(--g-mut);font-style:italic;margin-bottom:8px;line-height:1.5}
+  .side-ver{font-size:11px;color:var(--g-ink);font-weight:600}
+
   /* ---- Embedded mode (inside an iframe) -------------------------------
      Flow as a natural-height document so the parent page can auto-size the
-     iframe to the full content. The standalone (non-iframe) look is unchanged. */
+     iframe to the full content. The sidebar (sticky/scrolling) can't work in
+     an auto-grown iframe, so it's hidden there; the form flows full width. */
   html.anw-embedded, html.anw-embedded body{height:auto;min-height:0}
   html.anw-embedded body{display:block}
-  html.anw-embedded main{overflow:visible;min-height:0}
+  html.anw-embedded main{display:block;overflow:visible;min-height:0}
+  html.anw-embedded .sidebar{display:none}
+  html.anw-embedded .form-scroll{overflow:visible}
   html.anw-embedded .form-pane{min-height:0}
+
+  /* On narrow screens the sidebar is dropped; the form takes the full width. */
+  @media (max-width:860px){
+    .sidebar{display:none}
+  }
 
   .group{border-bottom:1px solid var(--g-line)}
   .group>summary{
@@ -191,6 +228,23 @@
 </header>
 
 <main>
+  <aside class="sidebar" id="sidebar">
+    <div class="side-status">
+      <h2 class="side-h">System Status</h2>
+      <div class="side-ready is-loading" id="sideReady">
+        <span class="dot-ok"></span><span id="sideReadyTxt">Loading…</span>
+      </div>
+    </div>
+    <nav class="side-nav" id="sideNav">
+      <h2 class="side-h">Configuration</h2>
+    </nav>
+    <div class="side-foot">
+      <div class="side-quote">“Build tools for the many, not the few.”</div>
+      <div class="side-ver">Solidarity Studio · Beta</div>
+    </div>
+  </aside>
+
+  <div class="form-scroll" id="formScroll">
   <section class="form-pane" id="formPane">
 
     <details class="intro" open>
@@ -249,6 +303,7 @@
     </div>
     <div id="formRoot" style="display:none"></div>
   </section>
+  </div><!-- /form-scroll -->
 </main>
 
 <footer class="brandbar">
@@ -532,13 +587,19 @@ function renderForm(){
     share:"SHARE_MODULE", footer:"FOOTER_MODULE"
   };
   var num = 0;
+  var navItems = [];
   var html = GROUPS.map(function(g){
     var items = byGroup[g[1]];
     if(!items.length) return "";
     num++;
     var n = (num<10?"0":"")+num;
+    navItems.push(
+      '<a class="snav-item" href="#grp-'+g[1]+'" data-target="grp-'+g[1]+'">'+
+        '<span class="snav-num">'+n+'</span>'+
+        '<span class="snav-label">'+g[0]+'</span>'+
+      '</a>');
     var openAttr = (g[1]==="identity"||g[1]==="colours"||g[1]==="fonts") ? " open":"";
-    return '<details class="group"'+openAttr+'><summary>'+
+    return '<details class="group" id="grp-'+g[1]+'"'+openAttr+'><summary>'+
              '<span class="num">'+n+'</span>'+
              '<span class="gname">'+g[0]+'</span>'+
              '<span class="mod">'+(MODTAG[g[1]]||"")+'</span>'+
@@ -548,7 +609,53 @@ function renderForm(){
   }).join("");
 
   $("formRoot").innerHTML = html;
+
+  /* Build the left sidebar nav from the same groups */
+  var nav = $("sideNav");
+  if(nav){ nav.innerHTML = '<h2 class="side-h">Configuration</h2>' + navItems.join(""); }
+  var ready = $("sideReady");
+  if(ready){ ready.classList.remove("is-loading");
+    var t = $("sideReadyTxt"); if(t) t.textContent = "Ready to generate"; }
+
   wireForm();
+  wireSideNav();
+}
+
+/* Left-sidebar navigation: click to open + scroll to a section,
+   and highlight the section nearest the top while scrolling. */
+function wireSideNav(){
+  var items = [].slice.call(document.querySelectorAll(".snav-item"));
+  if(!items.length) return;
+  var scroller = $("formScroll");
+  function setActive(it){
+    items.forEach(function(x){ x.classList.remove("active"); });
+    if(it) it.classList.add("active");
+  }
+  items.forEach(function(it){
+    it.addEventListener("click", function(e){
+      e.preventDefault();
+      var d = document.getElementById(it.getAttribute("data-target"));
+      if(!d) return;
+      d.open = true;
+      setActive(it);
+      d.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  });
+  if(scroller){
+    var spy = function(){
+      var ref = scroller.getBoundingClientRect().top;
+      var current = null;
+      items.forEach(function(it){
+        var d = document.getElementById(it.getAttribute("data-target"));
+        if(!d) return;
+        if(d.getBoundingClientRect().top - ref <= 100) current = it;
+      });
+      if(current) setActive(current);
+    };
+    scroller.addEventListener("scroll", spy, {passive:true});
+    spy();
+  }
+  if(!document.querySelector(".snav-item.active")) setActive(items[0]);
 }
 
 function cfgText(label,key,hint){
