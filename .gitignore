@@ -1,0 +1,16 @@
+# OS / editor cruft
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+*~
+*.swp
+*.tmp
+*.bak
+
+# Editor folders
+.vscode/
+.idea/
+.claude/

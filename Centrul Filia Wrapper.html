@@ -1,0 +1,860 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+
+  <!-- =======================================================================
+       ACTION NETWORK PAGE WRAPPER — reusable template (self-contained)
+       =======================================================================
+       Paste this whole file into an AN page-wrapper template. All styles are
+       inline in the <style id="anw-embed-css"> block below — no external CSS to
+       upload or cache-bust. The only asset you upload is the logo image.
+
+       PER-CLIENT SETUP (search for the word  CONFIG ):
+         1. CONFIG: COLOURS+FONTS — edit the tokens at the top of the <style>
+                                    block (Section 0), and the font <link>.
+         2. CONFIG: LOGO          — set the logo <img> src + alt + home link.
+         3. CONFIG: MODULES       — toggle optional behaviours (window.ANW).
+         4. CONFIG: LAYOUT        — pick the .gen_wrapper layout-- class.
+
+       The widget embed must use  ?format=js&style=full&css=whitelabel  so AN
+       ships only a minimal structural base; the styles below paint on top.
+
+       Source of truth for the CSS is an-embed.css (used by preview.html). If you
+       edit it there, paste its contents back into the <style> block below.
+       ======================================================================= -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+  <!-- CONFIG: LOGO — favicon (optional) -->
+  <link rel="icon" href="https://example.org/favicon.ico" />
+
+  <!-- Preconnect to origins we'll need — saves a round-trip on first request -->
+  <link rel="preconnect" href="https://actionnetwork.org">
+  <link rel="preconnect" href="https://can2-prod.s3.amazonaws.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- CONFIG: FONTS — loaded async (media=print swap) so it doesn't block render.
+       Request only the weights you use. Keep family in sync with --font-* tokens. -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"></noscript>
+
+
+  <!-- =======================================================================
+       BRAND STYLES (inline). Edit Section 0 tokens to re-theme.
+       ======================================================================= -->
+  <style id="anw-embed-css" type="text/css">
+
+  /* 0. THEME TOKENS — CONFIG: COLOURS+FONTS. The only part you normally edit. */
+  .an-homepage-embed {
+    /* FONTS — must match the font <link> above */
+    --font-body:        "Montserrat", Arial, sans-serif;
+    --font-heading:     "Anton", Arial, sans-serif;
+    --heading-weight:   400;
+    --heading-transform: none;          /* uppercase | none */
+    --button-transform: uppercase;      /* button text only */
+
+    /* COLOURS */
+    --brand:            #ed1c24;
+    --brand-hover:      #c70000;
+    --link:             #ed1c24;
+    --text:             #000000;
+    --heading:          #000000;
+    --required:         #c70000;
+
+    --page-bg:          #FAFAFA;
+    --header-bg:        #ed1c24;
+    --footer-bg:        #111111;
+    --footer-text:      rgba(255,255,255,.85);
+
+    --card-bg:          #ffffff;
+    --card-border:      rgba(197,202,187,.20);
+    --card-shadow:      0 30px 60px -15px rgba(35,47,74,.08);
+
+    --statement-bg:     #f3f3f7;
+    --statement-bar:    #000000;
+
+    --input-bg:         #ffffff;
+    --input-border:     #000000;
+    --input-focus:      #ed1c24;
+    --placeholder:      #6b7280;
+    --divider:          rgba(187,202,190,.30);
+
+    --skeleton:         #E3E3E3;
+    --hover-opacity:    .85;
+
+    /* SHAPE / SIZING */
+    --card-radius:      8px;
+    --statement-radius: 2px;
+    --button-radius:    25px;
+    --input-radius:     0;
+    --input-height:     50px;
+    --wrapper-max:      1200px;
+
+    /* LOGO sizing */
+    --logo-max-height:  40px;
+    --logo-max-width:   180px;
+  }
+
+  /* 1. BASE */
+  .an-homepage-embed {
+    font-family: var(--font-body);
+    color: var(--text);
+    background-color: var(--page-bg);
+  }
+  body.gen_body.an-homepage-embed { margin: 0; color: var(--heading); }
+  body.an-homepage-embed:not(.gen_body) { background-color: var(--card-bg) !important; margin: 0; }
+
+  .an-homepage-embed h1,
+  .an-homepage-embed h2,
+  .an-homepage-embed h3,
+  .an-homepage-embed h4,
+  .an-homepage-embed h5,
+  .an-homepage-embed #can_embed_form h2,
+  .an-homepage-embed #donate_auto_modal h2,
+  .an-homepage-embed #donate_make_recurring_modal h2 {
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
+    text-transform: var(--heading-transform);
+    color: var(--heading);
+  }
+  .an-homepage-embed #can_embed_form,
+  .an-homepage-embed #donate_auto_modal,
+  .an-homepage-embed #donate_make_recurring_modal { line-height: 24px; }
+
+  /* 2. HEADER — CONFIG: LOGO sizing via tokens */
+  .an-homepage-embed #gen_header {
+    padding: 4px 0;
+    background-color: var(--header-bg);
+    border-bottom: 1px solid rgba(0,0,0,.06);
+  }
+  .an-homepage-embed #gen_header .gen_wrapper {
+    padding-top: 8px; padding-bottom: 8px;
+    display: flex; align-items: center;
+  }
+  .an-homepage-embed #gen_header img {
+    max-height: var(--logo-max-height);
+    max-width: var(--logo-max-width);
+    width: auto; height: auto;
+  }
+  .an-homepage-embed .gen_name { margin: 0; color: var(--heading); }
+
+  /* 3. PAGE WRAPPER */
+  .an-homepage-embed .gen_wrapper {
+    padding: 48px 24px;
+    width: var(--wrapper-max);
+    max-width: 100%;
+    margin: auto;
+    box-sizing: border-box;
+  }
+
+  /* 4. COLUMNS — description plain, form on a white card */
+  .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_main_col,
+  .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_main_col {
+    background: transparent; padding: 0; box-sizing: border-box;
+  }
+  .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .gen_wrapper .survey_int,
+  .an-homepage-embed .gen_wrapper #can_embed_form.can_thank_you_wrap,
+  .an-homepage-embed .can_embed #can_embed_form.can_thank_you_wrap {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    padding: 33px;
+    box-sizing: border-box;
+  }
+  .an-homepage-embed .gen_wrapper [id^="can-fundraising-area"] {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  /* 4b. FUNDRAISER sidebar-hide [MODULE — enable via ANW.hideFundraiserSidebar].
+     Needs the iframe injector: it adds .an-hide-sidebar to the iframe <body>. */
+  .an-homepage-embed.can_fundraising_widget.an-hide-sidebar #can_sidebar { display: none !important; }
+  .an-homepage-embed.can_fundraising_widget.an-hide-sidebar #can_main_col { width: 100% !important; }
+
+  /* 4c. IFRAME CONTEXT — inset the form inside the donation / event widget.
+     No outer card there (iframe <body> has .an-homepage-embed but NOT .gen_body),
+     so without this the form runs flush to the iframe edges. Pad #can_embed_form
+     itself (not its inner .clearfix): the fundraiser nests .clearfix directly,
+     but ticketed events nest it one level deeper (#can_embed_form > div >
+     .clearfix), so a > .clearfix rule misses them. #can_embed_form is the
+     outermost wrapper in both, so padding it covers all sides in both layouts. */
+  .an-homepage-embed:not(.gen_body) #can_embed_form {
+    padding: 24px; box-sizing: border-box;
+  }
+
+  /* 5. QUOTE BOX (blockquote/q) + plain sidebar form heading.
+     The grey box is for actual quotes only — the "Sign This Petition" heading
+     (#can_sidebar .action_sidebar h4) must stay a plain heading. */
+  .an-homepage-embed #can_embed_form blockquote,
+  .an-homepage-embed #can_embed_form q {
+    background: var(--statement-bg);
+    border-left: 4px solid var(--statement-bar);
+    border-radius: var(--statement-radius);
+    padding: 16px 16px 16px 20px;
+    margin: 0 0 24px;
+    text-transform: none !important;
+    font-weight: 400;
+    line-height: 24px;
+  }
+  .an-homepage-embed #can_embed_form blockquote::before,
+  .an-homepage-embed #can_embed_form q::before { display: none !important; }
+  .an-homepage-embed #can_embed_form #can_sidebar .action_sidebar > h4,
+  .an-homepage-embed #can_embed_form #can_sidebar > h4 {
+    background: none; border: 0; border-radius: 0; padding: 0;
+    margin: 0 0 16px; font-size: 22px; line-height: 1.2; text-transform: none;
+  }
+  /* Kill whitelabel's decorative 1px underline bar under the heading. */
+  .an-homepage-embed #can_embed_form #can_sidebar .action_sidebar > h4::after,
+  .an-homepage-embed #can_embed_form #can_sidebar > h4::after { display: none !important; }
+
+  /* 6. ENTRY TITLE */
+  .an-homepage-embed #can_embed_form h2.entry-title,
+  .an-homepage-embed #can_embed_form h1.entry-title {
+    font-size: 32px;
+    line-height: 1.15;
+    margin-bottom: 16px !important;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    color: var(--brand);
+  }
+  .an-homepage-embed #can_embed_form .main_action_image { margin-bottom: 16px !important; }
+
+  /* 7. HIDE "SPONSORED BY" / "PETITION BY" [MODULE — on by default via the
+     an-hide-sponsor body class; ANW.hideSponsoredBy:false removes the class].
+     Incl. the thank-you variant (#can_thank_you #action_info .action_info_user
+     has no .action_owner_box). */
+  .an-homepage-embed.an-hide-sponsor #action_info_inner,
+  .an-homepage-embed.an-hide-sponsor .action_owner_box,
+  .an-homepage-embed.an-hide-sponsor .sponsor_owner_box,
+  .an-homepage-embed.an-hide-sponsor #can_thank_you #action_info { display: none !important; }
+
+  /* 8. FORM FIELDS */
+  .an-homepage-embed #can_embed_form label {
+    font-weight: 700; color: var(--heading);
+    font-size: 16px; line-height: 24px; margin-bottom: 4px; display: inline-block;
+  }
+  .an-homepage-embed #can_embed_form label .required,
+  .an-homepage-embed #can_embed_form .required { color: var(--required); }
+
+  .an-homepage-embed #can_embed_form input[type="text"],
+  .an-homepage-embed #can_embed_form input[type="password"],
+  .an-homepage-embed #can_embed_form input[type="url"],
+  .an-homepage-embed #can_embed_form input[type="email"],
+  .an-homepage-embed #can_embed_form input[type="tel"],
+  .an-homepage-embed #can_embed_form input[type="number"],
+  .an-homepage-embed #can_embed_form select.can_select,
+  .an-homepage-embed #can_embed_form span.can_select {
+    height: var(--input-height);
+    line-height: normal;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    border-radius: var(--input-radius);
+    padding: 0 13px;
+    box-sizing: border-box;
+  }
+  /* span.can_select shows the selected value as text — needs an explicit
+     line-height to vertically centre it (e.g. country picker "United Kingdom"). */
+  .an-homepage-embed #can_embed_form span.can_select {
+    line-height: calc(var(--input-height) - 2px);
+    padding-right: 30px;
+  }
+  .an-homepage-embed #can_embed_form textarea {
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    border-radius: var(--input-radius);
+    padding: 13px;
+    box-sizing: border-box;
+  }
+  .an-homepage-embed #can_embed_form input[type="text"]:focus,
+  .an-homepage-embed #can_embed_form input[type="password"]:focus,
+  .an-homepage-embed #can_embed_form input[type="url"]:focus,
+  .an-homepage-embed #can_embed_form input[type="email"]:focus,
+  .an-homepage-embed #can_embed_form input[type="tel"]:focus,
+  .an-homepage-embed #can_embed_form input[type="number"]:focus,
+  .an-homepage-embed #can_embed_form textarea:focus { border-color: var(--input-focus); }
+
+  .an-homepage-embed #can_embed_form input::placeholder,
+  .an-homepage-embed #can_embed_form textarea::placeholder { color: var(--placeholder); opacity: 1; }
+
+  .an-homepage-embed #can_embed_form .can_form .section_header,
+  .an-homepage-embed #can_embed_form #email_wrap,
+  .an-homepage-embed #can_embed_form #phone_wrap {
+    border-top: 1px solid var(--divider);
+    padding-top: 12px;
+  }
+  .an-homepage-embed #can_embed_form .can_field_description,
+  .an-homepage-embed #can_embed_form .form_caption,
+  .an-homepage-embed #can_embed_form .disclaimer {
+    font-size: 12px; line-height: 18px; color: var(--text);
+  }
+
+  /* 9. SUBMIT BUTTON */
+  .an-homepage-embed #can_embed_form input[type="submit"],
+  .an-homepage-embed #can_embed_form .button,
+  .an-homepage-embed #donate_auto_modal input[type="submit"],
+  .an-homepage-embed #donate_auto_modal .button {
+    background-color: var(--brand);
+    color: #fff;
+    border-radius: var(--button-radius);
+    font-size: 20px; font-weight: 700;
+    text-transform: var(--button-transform);
+    letter-spacing: .6px;
+    padding: 16px 20px;
+    line-height: 1.2;
+  }
+  .an-homepage-embed #can_embed_form input[type="submit"]:hover,
+  .an-homepage-embed #can_embed_form .button:hover,
+  .an-homepage-embed #donate_auto_modal input[type="submit"]:hover,
+  .an-homepage-embed #donate_auto_modal .button:hover { background-color: var(--brand-hover); color: #fff; }
+
+  /* 10. LINKS */
+  .an-homepage-embed a { color: var(--link); text-decoration: none; }
+  .an-homepage-embed a:hover { color: var(--link); opacity: var(--hover-opacity); text-decoration: underline; }
+
+  /* 11. PROGRESS BAR */
+  .an-homepage-embed .action_status_tracker { text-align: center; margin-bottom: 12px; }
+  .an-homepage-embed .action_status_running_total {
+    font-family: var(--font-heading); font-size: 1em; font-weight: 400 !important;
+    color: var(--brand) !important; margin-bottom: 6px;
+  }
+  .an-homepage-embed .action_status_status_bar {
+    display: block; width: 100%; height: 10px; border-radius: 5px;
+    background: #e0e0e0; overflow: hidden; margin: 0 0 6px;
+  }
+  .an-homepage-embed #can_embed_form .action-widget--toggle .action_status_status_bar span.action_status_status_bar-grow {
+    background: var(--brand) !important;
+  }
+  .an-homepage-embed .action_status_goal { font-size: 0.8em; color: #888; margin-bottom: 12px; }
+  .an-homepage-embed #can_embed_form_inner.survey_int #survey_questions_footer button {
+    height: auto !important; padding-top: 12px !important; padding-bottom: 12px !important;
+  }
+
+  /* 12. TWO-COLUMN LAYOUT */
+  .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix,
+  .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix,
+  .an-homepage-embed .gen_wrapper.layout--full   #can_embed_form > .clearfix {
+    align-items: flex-start; display: flex; flex-flow: row wrap; gap: 64px;
+  }
+  .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix .can_thank_you-block,
+  .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix .can_thank_you-block,
+  .an-homepage-embed .gen_wrapper.layout--full   #can_embed_form > .clearfix .can_thank_you-block,
+  .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form.can_768 > .clearfix .can_thank_you-block,
+  .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form.can_768 > .clearfix .can_thank_you-block,
+  .an-homepage-embed .gen_wrapper.layout--full   #can_embed_form.can_768 > .clearfix .can_thank_you-block,
+  .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix .can_thank_you-block #referral_code_select_wrap,
+  .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix .can_thank_you-block #referral_code_select_wrap,
+  .an-homepage-embed .gen_wrapper.layout--full   #can_embed_form > .clearfix .can_thank_you-block #referral_code_select_wrap { width: 100%; }
+  .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix #can_main_col #action_info .action_owner_box {
+    float: none; margin-right: 0; width: 100%;
+  }
+  .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix #can_main_col,
+  .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix #can_main_col { width: 100%; margin-bottom: 0; }
+  .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .gen_wrapper.layout--full   #can_embed_form > .clearfix #can_sidebar { margin-left: auto; }
+
+  @media (min-width: 768px) {
+    .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix,
+    .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix,
+    .an-homepage-embed .gen_wrapper.layout--full   #can_embed_form > .clearfix { flex-flow: row nowrap; }
+    .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form.can_thank_you_wrap > .clearfix,
+    .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form.can_thank_you_wrap > .clearfix,
+    .an-homepage-embed .gen_wrapper.layout--full   #can_embed_form.can_thank_you_wrap > .clearfix { flex-flow: row wrap; }
+    .an-homepage-embed .gen_wrapper.layout--equal #can_embed_form > .clearfix #can_main_col { width: 56%; margin-bottom: 0; }
+    .an-homepage-embed .gen_wrapper.layout--equal #can_embed_form > .clearfix #can_sidebar { width: 40%; }
+    .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix #can_main_col { width: 30%; margin-bottom: 0; }
+    .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix #can_sidebar { width: 65%; }
+    .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix #can_letter_one_col #can_sidebar,
+    .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix #can_letter_one_col #can_main_col,
+    .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix #can_letter_one_col #can_sidebar,
+    .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix #can_letter_one_col #can_main_col { width: 100%; }
+  }
+
+  .an-homepage-embed .gen_wrapper.layout--full #can_embed_form > .clearfix { flex-flow: row wrap; }
+  .an-homepage-embed .gen_wrapper.layout--full #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .gen_wrapper.layout--full #can_embed_form > .clearfix #can_main_col { width: 100%; margin-bottom: 0; }
+
+  .an-homepage-embed .gen_wrapper.layout--reverse .event_campaign #can_embed_form > .clearfix,
+  .an-homepage-embed .gen_wrapper.layout--full   .event_campaign #can_embed_form > .clearfix,
+  .an-homepage-embed .gen_wrapper.layout--equal  .event_campaign #can_embed_form > .clearfix { flex-flow: row wrap; }
+  .an-homepage-embed .gen_wrapper.layout--reverse .event_campaign #can_embed_form > .clearfix .entry-title,
+  .an-homepage-embed .gen_wrapper.layout--full   .event_campaign #can_embed_form > .clearfix .entry-title,
+  .an-homepage-embed .gen_wrapper.layout--equal  .event_campaign #can_embed_form > .clearfix .entry-title { width: 100%; }
+  .an-homepage-embed .gen_wrapper.layout--reverse .event_campaign #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .gen_wrapper.layout--full   .event_campaign #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .gen_wrapper.layout--equal  .event_campaign #can_embed_form > .clearfix #can_sidebar { order: 2; }
+
+  /* Host-site embed context (.can_embed) */
+  .an-homepage-embed .can_embed #can_embed_form > .clearfix,
+  .an-homepage-embed .can_embed #can_embed_form > div > .clearfix {
+    align-items: flex-start; display: flex; flex-flow: row wrap; gap: 64px;
+  }
+  .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_sidebar,
+  .an-homepage-embed .can_embed #can_embed_form > div > .clearfix #can_sidebar { margin-left: auto; width: 100%; }
+  .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_main_col,
+  .an-homepage-embed .can_embed #can_embed_form > div > .clearfix #can_main_col { width: 100%; margin-bottom: 0; }
+  @media (min-width: 768px) {
+    .an-homepage-embed .can_embed #can_embed_form > .clearfix,
+    .an-homepage-embed .can_embed #can_embed_form > div > .clearfix { flex-flow: row nowrap; }
+    .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_sidebar,
+    .an-homepage-embed .can_embed #can_embed_form > div > .clearfix #can_sidebar { width: 40%; }
+    .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_main_col,
+    .an-homepage-embed .can_embed #can_embed_form > div > .clearfix #can_main_col { width: 56%; margin-bottom: 0; }
+  }
+
+  /* Basic embed wrapper (no layout-- / no can_embed) */
+  .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix {
+    align-items: flex-start; display: flex; flex-flow: row wrap; gap: 64px;
+  }
+  .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_sidebar { margin-left: auto; width: 100%; }
+  .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_main_col { width: 100%; margin-bottom: 0; }
+  @media (min-width: 768px) {
+    .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix { flex-flow: row nowrap; }
+    .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_sidebar { width: 40%; }
+    .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_main_col { width: 56%; margin-bottom: 0; }
+  }
+
+  /* 13. CLEARFIX PSEUDO-ELEMENT FIX */
+  .an-homepage-embed #can_embed_form > .clearfix::before,
+  .an-homepage-embed #can_embed_form > .clearfix::after { display: none !important; }
+
+  /* 14. HIDE "EMBED THIS ACTION" BLOCK */
+  .an-homepage-embed .can_thank_you-block:has(.embed_textarea) { display: none !important; }
+
+  /* 15. SURVEY */
+  .an-homepage-embed .survey_int .control-label.check_radio_label { font-size: 1em; font-weight: 500; }
+
+  /* 16. FOOTER — full-bleed (AN renders it inside the centred .gen_wrapper) */
+  .an-homepage-embed #gen_footer {
+    position: relative; left: 50%; right: 50%; width: 100vw;
+    margin-top: 48px; margin-left: -50vw; margin-right: -50vw; box-sizing: border-box;
+    background: var(--footer-bg); color: var(--footer-text);
+    text-align: center; padding: 40px 24px; font-size: 13px; line-height: 20px;
+  }
+  /* Cancel .gen_wrapper bottom padding so there's no gap beneath the band. */
+  .an-homepage-embed .gen_wrapper > #gen_footer { margin-bottom: -48px; }
+  .an-homepage-embed #gen_footer a { color: var(--footer-text); text-decoration: underline; }
+
+  /* 17. LOADING PLACEHOLDER */
+  /* Reserve height so the footer doesn't ride up to the top while AN's form
+     is still rendering (the loader is absolutely positioned, so without this
+     the empty wrapper would collapse to just its padding). */
+  .an-homepage-embed .gen_wrapper.layout--equal,
+  .an-homepage-embed .gen_wrapper.layout--reverse,
+  .an-homepage-embed .gen_wrapper.layout--full { position: relative; min-height: 450px; }
+  #anw-loader {
+    position: absolute; inset: 0; min-height: 450px; z-index: 10;
+    background: var(--page-bg); margin: 0; pointer-events: none;
+  }
+  .anw-loader__pad {
+    padding: 48px 24px 0; display: flex; justify-content: space-between;
+    gap: 32px; width: 100%; box-sizing: border-box;
+  }
+  /* Left column — description, plain (no card), matches the 56% main column. */
+  .anw-loader__desc { width: 56%; padding-top: 4px; box-sizing: border-box; }
+  .anw-loader__card {
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: var(--card-radius); box-shadow: var(--card-shadow);
+    width: 40%; min-width: 320px; padding: 33px; box-sizing: border-box;
+  }
+  .anw-loader__line {
+    background: var(--skeleton); border-radius: 4px; margin-bottom: 14px;
+    animation: anw-pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes anw-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  @media (max-width: 767px) {
+    .anw-loader__pad  { flex-direction: column; justify-content: flex-start; padding-top: 28px; gap: 24px; }
+    .anw-loader__desc { width: 100%; }
+    .anw-loader__card { width: 100%; min-width: 0; }
+  }
+
+  /* 18. MOBILE */
+  @media (max-width: 767px) {
+    .an-homepage-embed #can_embed_form h2.entry-title,
+    .an-homepage-embed #can_embed_form h1.entry-title { font-size: 24px !important; line-height: 1.2 !important; }
+    .an-homepage-embed .gen_wrapper { padding: 28px 16px; }
+    .an-homepage-embed .gen_wrapper > #gen_footer { margin-bottom: -28px; }
+    .an-homepage-embed .gen_wrapper.layout--reverse #can_embed_form > .clearfix,
+    .an-homepage-embed .gen_wrapper.layout--equal  #can_embed_form > .clearfix,
+    .an-homepage-embed .gen_wrapper.layout--full   #can_embed_form > .clearfix { gap: 24px; }
+    .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_sidebar,
+    .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_sidebar { padding: 20px !important; }
+  }
+
+  /* 19. SHARE BUTTONS — injected into the thank-you page by the module below. */
+  .an-homepage-embed .anw-share { margin-top: 28px; text-align: center; }
+  .an-homepage-embed .anw-share__label {
+    margin: 0 0 12px; font-size: 15px;
+    font-family: var(--font-heading, inherit);
+    font-weight: var(--heading-weight, 700); color: var(--heading, inherit);
+  }
+  .an-homepage-embed .share-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .an-homepage-embed .share-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 25px; border: none; color: #fff;
+    font-size: 14px; font-weight: 500; font-family: inherit;
+    cursor: pointer; text-decoration: none;
+    transition: opacity .2s ease, transform .1s ease;
+  }
+  .an-homepage-embed .share-btn:hover  { opacity: .85; color: #fff; text-decoration: none; }
+  .an-homepage-embed .share-btn:active { transform: scale(.97); }
+  .an-homepage-embed .share-btn svg { flex: 0 0 auto; }
+  .an-homepage-embed .share-btn.whatsapp { background-color: #25D366; }
+  .an-homepage-embed .share-btn.facebook { background-color: #1877F2; }
+  .an-homepage-embed .share-btn.x        { background-color: #000000; }
+  .an-homepage-embed .share-btn.bluesky  { background-color: #1185FE; }
+  .an-homepage-embed .share-btn.linkedin { background-color: #0A66C2; }
+  .an-homepage-embed .share-btn.copy     { background-color: #555555; }
+
+  </style>
+
+  <script>
+    /* =====================================================================
+       CONFIG: MODULES — per-client toggles. This is the bit you change.
+       ===================================================================== */
+    window.ANW = {
+      /* Pre-tick "Make This Recurring Monthly" on fundraiser pages.
+         true  = monthly is pre-selected (donor can still untick)
+         false = leave AN's default (one-off)
+         OFF by default: pre-ticking recurring donations may be disallowed by
+         some orgs / payment processors — enable only with the client's sign-off. */
+      recurringPretick: false,
+
+      /* Hide the description sidebar on fundraiser pages so the donation form
+         goes full width. Relies on the iframe injector below. */
+      hideFundraiserSidebar: false,
+
+      /* Hide AN's "sponsored by" / "petition by" attribution line.
+         true  = hidden (default — the an-hide-sponsor body class is on by default)
+         false = show who the action is by. */
+      hideSponsoredBy: true,
+
+      /* Font stylesheet URL also loaded inside the fundraiser iframe so the
+         donation form uses the brand font. Keep in sync with the <link> above. */
+      fontUrl: "https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap",
+
+      /* Share buttons on the thank-you page.
+         shareButtons   — master on/off for the whole widget.
+         shareLabel     — the prompt line shown above the buttons.
+         sharePlatforms — turn individual networks on/off. */
+      shareButtons: true,
+      shareLabel: "Distribuie cu prietenii tăi",
+      sharePlatforms: {
+        whatsapp: true,
+        facebook: true,
+        x:        false,
+        bluesky:  false,
+        linkedin: false,
+        copy:     false
+      }
+    };
+
+    /* Sponsored-by: hidden by default via the an-hide-sponsor body class.
+       Only act when the client has opted to SHOW it. */
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.ANW && window.ANW.hideSponsoredBy === false) {
+        document.body.classList.remove('an-hide-sponsor');
+      }
+    });
+  </script>
+
+  <script>
+    /* Inject our inline styles (and the brand font) into the fundraiser iframe
+       (same-origin) and tag its <body> so scoped rules apply. The donation
+       widget renders in an iframe whose document is replaced once the widget
+       loads, so we re-inject on its 'load' event. Reads the inline
+       <style id="anw-embed-css"> textContent — single source, no URL. */
+    (function () {
+      'use strict';
+      var styleEl = document.getElementById('anw-embed-css');
+      var CSS_TEXT = styleEl ? styleEl.textContent : '';
+
+      /* Inject into one iframe's document. Idempotent: if our <style> is already
+         present it just re-asserts the body classes and returns. Returns true
+         once the doc is reachable and styled. AN replaces the iframe document
+         after its widget JS runs, which removes our <style> — so when that
+         happens getElementById() misses and we re-inject. */
+      function injectIntoIframe(iframe) {
+        try {
+          var doc = iframe.contentDocument || iframe.contentWindow.document;
+          if (!doc || !doc.head || !doc.body) return false;
+          doc.body.classList.add('an-homepage-embed');
+          if (window.ANW.hideFundraiserSidebar) doc.body.classList.add('an-hide-sidebar');
+          if (window.ANW.hideSponsoredBy !== false) doc.body.classList.add('an-hide-sponsor');
+          if (doc.getElementById('anw-iframe-styles')) return true;
+          if (window.ANW.fontUrl) {
+            var fl = doc.createElement('link');
+            fl.rel = 'stylesheet'; fl.href = window.ANW.fontUrl;
+            doc.head.appendChild(fl);
+          }
+          var s = doc.createElement('style');
+          s.id = 'anw-iframe-styles';
+          s.type = 'text/css';
+          s.appendChild(doc.createTextNode(CSS_TEXT));
+          doc.head.appendChild(s);
+          return true;
+        } catch (e) { return false; }   /* not ready yet, or transiently cross-origin */
+      }
+
+      /* Sweep EVERY same-origin iframe on the page. The donation widget uses
+         iframe#can_embed_iframe, but ticketed-event payment widgets use a
+         different id — scanning all iframes covers both without hard-coding. */
+      function sweep() {
+        var frames = document.querySelectorAll('iframe');
+        for (var i = 0; i < frames.length; i++) {
+          var f = frames[i];
+          injectIntoIframe(f);
+          if (!f._anwBound) {
+            f._anwBound = true;
+            f.addEventListener('load', function () { injectIntoIframe(this); });
+          }
+        }
+      }
+
+      /* Poll for ~30s. Cheap, and the only reliable way to re-style after AN
+         swaps the iframe document without firing a 'load' we can catch in time. */
+      sweep();
+      var ticks = 0, MAX = 120;            // 120 × 250ms = 30s
+      var timer = setInterval(function () {
+        ticks++;
+        sweep();
+        if (ticks >= MAX) clearInterval(timer);
+      }, 250);
+
+      /* Also react immediately when an iframe is (re)added to the DOM. */
+      var observer = new MutationObserver(sweep);
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+    })();
+  </script>
+
+  <script>
+    /* MODULE (gated): pre-tick "Make This Recurring Monthly" on fundraisers.
+       Runs only when ANW.recurringPretick === true. The donation form lives in
+       an iframe whose document is replaced once the widget loads, so we poll
+       (re-reading contentDocument each tick). Ticks once via .click() so AN's
+       own handlers run; the user can still untick. */
+    (function () {
+      'use strict';
+      if (!(window.ANW && window.ANW.recurringPretick)) return;
+      var tries = 0, MAX = 80; // ~24s at 300ms
+      var timer = setInterval(function () {
+        tries++;
+        var iframe = document.querySelector('[id^="can-fundraising-area"] iframe, iframe#can_embed_iframe');
+        if (iframe) {
+          try {
+            var doc = iframe.contentDocument || iframe.contentWindow.document;
+            var cb = doc && doc.querySelector('input[name="donation[recurring]"]');
+            if (cb) {
+              clearInterval(timer);
+              if (!cb._anwDone) { cb._anwDone = true; if (!cb.checked) cb.click(); }
+              return;
+            }
+          } catch (e) { /* iframe not ready / cross-origin transient */ }
+        }
+        if (tries >= MAX) clearInterval(timer);
+      }, 300);
+    })();
+  </script>
+
+  <script>
+    /* MODULE: social share buttons on the thank-you page.
+       After a successful action AN adds .can_thank_you_wrap to #can_embed_form
+       and injects #can_thank_you (petition / form / letter thank-yous render
+       inline). We watch for that node and append the share row once. Which
+       networks show is driven by ANW.sharePlatforms; master on/off is
+       ANW.shareButtons; the prompt is ANW.shareLabel. Networks are real
+       <a target="_blank"> links (clean new tab, no popup); "Copy link" copies
+       the current page URL to the clipboard. */
+    (function () {
+      'use strict';
+      if (window.ANW && window.ANW.shareButtons === false) return;
+
+      var ICON = {
+        whatsapp: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>',
+        facebook: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
+        x:        '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+        bluesky:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.038.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.018.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg>',
+        linkedin: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>',
+        copy:     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
+      };
+      var TEXT = {
+        whatsapp: 'Share on WhatsApp', facebook: 'Share on Facebook',
+        x: 'Share on X', bluesky: 'Share on Bluesky', linkedin: 'Share on LinkedIn',
+        copy: 'Copy link'
+      };
+      var ORDER = ['whatsapp', 'facebook', 'x', 'bluesky', 'linkedin', 'copy'];
+      var PLATS = (window.ANW && window.ANW.sharePlatforms) || { whatsapp: true, facebook: true };
+      var LABEL = (window.ANW && window.ANW.shareLabel) || 'Share this with your network';
+
+      /* encodeURIComponent escapes quotes/&/<> too, so the result is safe to drop
+         straight into a double-quoted href attribute. */
+      function linkFor(net, title, href) {
+        switch (net) {
+          case 'whatsapp': return 'https://wa.me/?text=' + encodeURIComponent(title + '\n' + href);
+          case 'facebook': return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(href);
+          case 'x':        return 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(href);
+          case 'bluesky':  return 'https://bsky.app/intent/compose?text=' + encodeURIComponent(title + ' ' + href);
+          case 'linkedin': return 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(href);
+        }
+        return '#';
+      }
+
+      function build() {
+        var href = window.location.href, title = document.title, html = '';
+        ORDER.forEach(function (net) {
+          if (!PLATS[net]) return;
+          var inner = ICON[net] + '<span class="anw-btn-text">' + TEXT[net] + '</span>';
+          if (net === 'copy') {
+            html += '<button type="button" class="share-btn copy" data-net="copy">' + inner + '</button>';
+          } else {
+            /* Real anchor + target="_blank" — browser opens a clean new tab. */
+            html += '<a class="share-btn ' + net + '" target="_blank" rel="noopener noreferrer" href="' + linkFor(net, title, href) + '">' + inner + '</a>';
+          }
+        });
+        if (!html) return null;   // every network turned off
+
+        var wrap = document.createElement('div');
+        wrap.className = 'anw-share';
+        wrap.innerHTML = '<p class="anw-share__label"></p><div class="share-buttons">' + html + '</div>';
+        wrap.querySelector('.anw-share__label').textContent = LABEL;   // text node, no HTML injection
+
+        wrap.addEventListener('click', function (e) {
+          var btn = e.target.closest ? e.target.closest('.share-btn') : null;
+          if (!btn) return;
+          e.stopPropagation();   /* keep the click out of AN's #can_embed_form handlers */
+          if (btn.getAttribute('data-net') !== 'copy') return;   /* anchors: native new tab */
+          e.preventDefault();
+          copyLink(window.location.href, btn);
+        });
+        return wrap;
+      }
+
+      function copyLink(text, btn) {
+        function flash() {
+          var t = btn.querySelector('.anw-btn-text'); if (!t) return;
+          var prev = t.textContent; t.textContent = 'Copied!';
+          setTimeout(function () { t.textContent = prev; }, 1600);
+        }
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta); flash();
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(flash, fallback);
+        } else { fallback(); }
+      }
+
+      function place() {
+        var ty = document.getElementById('can_thank_you') ||
+                 document.querySelector('#can_embed_form.can_thank_you_wrap');
+        if (!ty) return false;
+        if (ty.querySelector('.anw-share')) return true;   // already added
+        var row = build();
+        if (row) ty.appendChild(row);
+        return true;
+      }
+
+      if (!place()) {
+        var obs = new MutationObserver(function () { if (place()) obs.disconnect(); });
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+      }
+    })();
+  </script>
+
+</head>
+<body class="gen_body an-homepage-embed an-hide-sponsor">
+
+  <!-- CONFIG: LOGO — header logo bar -->
+  <div id="gen_header">
+    <div class="gen_wrapper">
+      <a href="https://centrulfilia.ro/" target="_blank" rel="noopener">
+        <img src="https://actionnetwork.org/user_files/user_files/000/143/703/original/cf-logo.png" alt="Centrul Filia" />
+      </a>
+      <h1 class="gen_name"></h1>
+    </div>
+  </div>
+
+  <!-- CONFIG: LAYOUT — choose one:
+       layout--equal   description 56% / form 40%  (default, matches the design)
+       layout--reverse description 30% / form 65%  (long letters / big forms)
+       layout--full    single column -->
+  <div class="gen_wrapper layout--equal">
+
+    <!-- Loading placeholder — hidden once AN's form JS renders -->
+    <div id="anw-loader">
+      <div class="anw-loader__pad">
+        <div class="anw-loader__desc">
+          <div class="anw-loader__line" style="height:34px;width:85%;margin-bottom:26px;"></div>
+          <div class="anw-loader__line" style="height:15px;width:96%;"></div>
+          <div class="anw-loader__line" style="height:15px;width:100%;"></div>
+          <div class="anw-loader__line" style="height:15px;width:92%;"></div>
+          <div class="anw-loader__line" style="height:15px;width:98%;"></div>
+          <div class="anw-loader__line" style="height:15px;width:70%;margin-bottom:26px;"></div>
+          <div class="anw-loader__line" style="height:15px;width:90%;"></div>
+          <div class="anw-loader__line" style="height:15px;width:55%;margin-bottom:0;"></div>
+        </div>
+        <div class="anw-loader__card">
+          <div class="anw-loader__line" style="height:28px;width:65%;margin-bottom:24px;"></div>
+          <div class="anw-loader__line" style="height:15px;width:90%;"></div>
+          <div class="anw-loader__line" style="height:15px;width:82%;"></div>
+          <div class="anw-loader__line" style="height:15px;width:87%;margin-bottom:28px;"></div>
+          <div class="anw-loader__line" style="height:50px;width:100%;border-radius:6px;margin-bottom:0;"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        function fadeLoader() {
+          document.querySelectorAll('#anw-loader').forEach(function (loader) {
+            loader.style.transition = 'opacity 0.35s';
+            loader.style.opacity = '0';
+            setTimeout(function () { loader.style.display = 'none'; }, 350);
+          });
+        }
+        function check() {
+          if (document.querySelector('#can_embed_form input, #can_embed_form .entry-title')) {
+            fadeLoader(); return true;
+          }
+          var iframe = document.querySelector('[id^="can-fundraising-area"] iframe');
+          if (iframe && !iframe._anwWatching) {
+            iframe._anwWatching = true;
+            iframe.addEventListener('load', function () { setTimeout(fadeLoader, 600); });
+            return true;
+          }
+          return false;
+        }
+        if (!check()) {
+          var observer = new MutationObserver(function () {
+            if (check()) { observer.disconnect(); }
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+      })();
+    </script>
+
+    <!-- END TEMPLATE HEADER - START WIDGET -->
+
+  </div>
+
+  <!-- CONFIG: FOOTER (optional) — delete this block if not wanted. -->
+  <div id="gen_footer">
+    Centrul Filia – Cod: 12991209 | Toate drepturile sunt rezervate
+Copyright © 2026 Doneaza acum – Centrul FILIA
+    <a href="https://centrulfilia.ro/politica-de-confidentialitate/">Politică de confidențialitate</a>
+  </div>
+
+</body>
+</html>
