@@ -86,12 +86,13 @@
 
   /* ---- Embedded mode (inside an iframe) -------------------------------
      Flow as a natural-height document so the parent page can auto-size the
-     iframe to the full content. The sidebar (sticky/scrolling) can't work in
-     an auto-grown iframe, so it's hidden there; the form flows full width. */
+     iframe to the full content. The sidebar stays visible (as a static column,
+     not sticky) but its internal scroll is removed so it grows with the page;
+     it still folds away under 860px via the media query below. */
   html.anw-embedded, html.anw-embedded body{height:auto;min-height:0}
   html.anw-embedded body{display:block}
-  html.anw-embedded main{display:block;overflow:visible;min-height:0}
-  html.anw-embedded .sidebar{display:none}
+  html.anw-embedded main{overflow:visible;min-height:0}
+  html.anw-embedded .sidebar{overflow:visible}
   html.anw-embedded .form-scroll{overflow:visible}
   html.anw-embedded .form-pane{min-height:0}
 
