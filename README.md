@@ -1,124 +1,158 @@
-# Action Network wrapper — reusable template
+# Action Network wrapper — template + generator
 
-A starting point for branding Action Network (AN) custom page wrappers across
-client projects. Built on AN's **whitelabel** CSS base (layout styles only),
-with a thin, fully tokenised brand layer on top.
+Branding for **Action Network (AN) custom page wrappers**: the frame (colours,
+fonts, logo, layout, footer, share buttons) that wraps an AN action — petition,
+form, sign-up or donation page.
+
+Two things live here:
+
+1. **`wrapper.html`** — the self-contained wrapper template you paste into AN.
+2. **`generator.html`** — a single-file, no-build web tool that themes
+   `wrapper.html` with simple form controls, so non-coders never touch the code.
+
+## Live links
+
+| What | URL |
+|------|-----|
+| Public tool (Webflow page) | https://www.solidaritystudio.uk/tools/action-network-wrapper |
+| Tool hosted directly (GitHub Pages) | https://jbrindle18.github.io/action-network-wrappers/generator.html |
+| Repo | https://github.com/jbrindle18/action-network-wrappers |
+
+The Webflow page embeds the GitHub Pages URL in an `<iframe>` (see
+`webflow-embed.html`). Editing the repo + pushing to `main` updates both,
+because GitHub Pages serves `main` and Webflow just frames it.
 
 ## Files
 
-| File            | What it is                                                              |
-|-----------------|-------------------------------------------------------------------------|
-| `wrapper.html`  | **The deliverable, and the single source.** A self-contained AN page wrapper — all styles are inline in the `<style id="anw-embed-css">` block and all JS is inline too, so there's nothing to upload but the logo. Edit this file directly; paste the whole thing into the AN wrapper template. |
-| `README.md`     | This file.                                                              |
+| File | What it is |
+|------|------------|
+| `wrapper.html` | **The deliverable and the single source of truth.** A self-contained AN page wrapper — all CSS is inline in `<style id="anw-embed-css">`, all JS is inline; the only asset you upload is the logo. Section 0 holds the theme tokens. |
+| `generator.html` | The themeing tool. **Bakes a copy of `wrapper.html` into itself as base64** (`<script id="masterB64">`) and decodes it on boot — no network fetch. Renders a form from the tokens, rebuilds a themed wrapper, and offers Copy Header / Copy Footer / Save / Import. |
+| `rebake.py` | Refreshes the base64 copy of `wrapper.html` inside `generator.html`. **Run after every `wrapper.html` edit** (see below). |
+| `webflow-embed.html` | The `<iframe>` + auto-resize snippet to paste into a Webflow Embed element. |
+| `Centrul Filia Wrapper.html` | A real themed wrapper (Centrul Filia), kept as a worked example. |
+| `README.md` | This file. |
 
-> There is no separate `.css` file or local preview harness any more — the
-> wrapper HTML is everything. To check styling, use AN's own page-wrapper
-> **Preview** (Groups → page wrappers → Preview).
+## How it works — whitelabel base + brand layer
 
-## Approach: whitelabel base + brand layer
+The action widget is embedded with `?format=js&style=full&css=whitelabel`, so AN
+ships only a minimal **structural** stylesheet (field layout, spacing). The
+inline `<style>` block in `wrapper.html` paints the brand over that neutral
+skeleton — few `!important`s, predictable base. All CSS is scoped under
+`.an-homepage-embed` so nothing leaks into other embeds.
 
-The widget is embedded with `?format=js&style=full&css=whitelabel`, so AN ships
-only a minimal **structural** stylesheet (field layout, spacing). The inline
-`<style>` block in `wrapper.html` paints the brand over that neutral skeleton.
-This means few `!important`s and a predictable base — as opposed to overriding
-AN's full default styles.
+`generator.html` parses Section 0's `--token: value;` declarations into form
+fields, plus a handful of config anchors (logo, fonts, layout, modules, share),
+and rebuilds the wrapper via targeted string replacement. The encoding round-trip
+is UTF-8-safe (handles £, em-dashes, etc.).
 
-## Per-client setup (the 3 things you usually change)
+## Using the tool (the normal, no-code workflow)
 
-Everything is searchable in `wrapper.html` by the keyword **`CONFIG`**.
+1. Open the tool. Work through the sections — colours, fonts, logo, layout,
+   footer, share options.
+2. **Copy Header** → paste into the **Header** box of your AN page wrapper.
+   **Copy Footer** → paste into the **Footer** box.
+   (In AN: Start Organizing → your group → Page wrappers → new/edit wrapper.)
+3. Save in AN; set your action to use that wrapper.
+4. **Save Wrapper** keeps a `wrapper.html` file. Next time, **Import Saved
+   Wrapper** reloads all its settings so you can pick up where you left off.
 
-### 1. Colours + Fonts
-Edit **Section 0 (THEME TOKENS)** at the top of the `<style id="anw-embed-css">`
-block in `wrapper.html` — brand colour, text, card, inputs, statement box,
-footer, radii, etc. Then update the Google Fonts `<link>` (CONFIG: FONTS) to
-match `--font-body` / `--font-heading`. Request only the weights you use.
+Always check the result in AN's own page-wrapper **Preview** before going live.
 
-### 2. Logo
-In `wrapper.html` (CONFIG: LOGO) set the `<img>` `src` + `alt` and the home
-link. The logo is the **only** asset you upload — put it in AN `user_files` and
-use its absolute URL. Size is controlled by `--logo-max-height` /
-`--logo-max-width` tokens.
+## ⚠️ Re-baking — the one maintenance rule
 
-> **No CSS upload / cache-bust.** Because the styles are inline in
-> `wrapper.html`, there's no external stylesheet to upload and no `?v=N` to bump.
-> The styles apply directly to the markup AN injects into the page.
+`generator.html` does **not** load `wrapper.html` at runtime; it carries a
+**base64 copy baked inside it**. So if you edit `wrapper.html`, the hosted tool
+keeps serving the OLD wrapper until you re-bake:
 
-## JavaScript / modules
+```bash
+python rebake.py          # refresh the baked-in copy
+python rebake.py --check  # exit 1 if stale (handy for CI / pre-commit)
+```
 
-`wrapper.html` carries a small amount of JS. Toggles live in the
-**`window.ANW`** block near the top of `wrapper.html` (CONFIG: MODULES):
+Then commit **both** `wrapper.html` and `generator.html` together. If you ever
+see the tool produce stale output, an un-baked `wrapper.html` edit is the first
+thing to check.
+
+## Editing `wrapper.html` by hand (advanced)
+
+Everything tweakable is searchable by the keyword **`CONFIG`**.
+
+### Colours + fonts
+Edit **Section 0 (THEME TOKENS)** at the top of `<style id="anw-embed-css">` —
+brand colour, text, card, inputs, statement box, footer, radii. Then update the
+Google Fonts `<link>` (CONFIG: FONTS) to match `--font-body` / `--font-heading`;
+request only the weights you use. Default palette is green
+(`--brand: #0e7a43`, hover `#0a5c33`).
+
+### Logo
+CONFIG: LOGO — set the `<img>` `src` + `alt` and the home link. The logo is the
+**only** asset you upload — put it in AN `user_files` and use its absolute URL.
+Size is controlled by `--logo-max-height` / `--logo-max-width`.
+
+> No CSS upload / cache-bust: styles are inline, so there's no external
+> stylesheet to upload and no `?v=N` to bump.
+
+### Modules (`window.ANW`)
+Toggles live in the `window.ANW` block (CONFIG: MODULES):
 
 ```js
 window.ANW = {
   recurringPretick: false,        // pre-tick "Make This Recurring Monthly"
   hideFundraiserSidebar: false,   // hide the donation iframe's right sidebar
-  shareButtons: true,             // WhatsApp+Facebook buttons on the thank-you page
-  shareLabel: "Share this with your network",  // prompt text above the buttons
+  shareButtons: true,             // share buttons on the thank-you page
+  shareLabel: "Share this with your network",
   fontUrl: "https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&display=swap"
 };
 ```
 
 - **Loader fade** *(always on)* — fades out the loading skeleton once AN's form
-  (inline page) or donation iframe (fundraiser) has rendered.
+  or donation iframe has rendered.
 - **Fundraiser iframe injection** *(always on)* — the donation widget renders in
   a same-origin iframe whose document AN replaces after its widget JS loads. This
-  module copies the inline `<style id="anw-embed-css">` text and the font `<link>`
-  into that iframe, and tags its `<body>` with `an-homepage-embed` (plus
-  `an-hide-sidebar` when `hideFundraiserSidebar` is true), so the brand styles
-  apply inside the iframe too. Because AN swaps the iframe document after its
-  widget JS runs (wiping our styles), it sweeps **every** same-origin iframe —
-  covering both fundraiser and ticketed-event widgets — re-injecting on the
-  `load` event, on a ~30s poll, and via a MutationObserver. The sweep is
-  idempotent, so re-runs are cheap.
-- **Recurring pre-tick** *(toggle — `recurringPretick`)* — pre-ticks "Make This
-  Recurring Monthly" on fundraiser pages by ticking the checkbox in the
-  same-origin iframe.
+  module copies the inline CSS + font `<link>` into that iframe and tags its
+  `<body>` so the brand styles apply inside it too. It re-injects on `load`, on a
+  ~30s poll, and via a MutationObserver; the sweep is idempotent.
+- **Recurring pre-tick** *(toggle)* — pre-ticks "Make This Recurring Monthly".
+  ⚠️ May be disallowed by some orgs / payment processors — ships OFF.
+- **Share buttons** *(toggle, default ON)* — appends share buttons to the
+  thank-you page (`#can_thank_you`), watched via MutationObserver. Shares the AN
+  action URL. Fundraiser thank-yous live in AN's own iframe and aren't covered.
 
-  ⚠️ Pre-ticking recurring donations may be disallowed by some orgs / payment
-  processors — ship OFF, enable only with the client's sign-off.
-- **Share buttons** *(toggle — `shareButtons`, default ON)* — appends WhatsApp +
-  Facebook share buttons to the thank-you page. AN injects the thank-you view
-  (`#can_thank_you`) after submission, so the module watches for that node with a
-  MutationObserver and adds the buttons once. Shares `window.location.href` (the
-  AN action URL). Prompt text is set by `shareLabel`. Petition / form / letter
-  thank-yous render inline; fundraiser thank-yous live in AN's own iframe and are
-  not covered.
+### Layout
+Pick a class on `.gen_wrapper` (CONFIG: LAYOUT):
 
-## Layout
+| Class | Description col | Form col | Use for |
+|-------|-----------------|----------|---------|
+| `layout--equal` | 56% | 40% | Default — petitions/forms |
+| `layout--reverse` | 30% | 65% | Long letters / big forms |
+| `layout--full` | 100% | 100% | Single column |
 
-Pick a class on `.gen_wrapper` in `wrapper.html` (CONFIG: LAYOUT):
+## Deploying to Action Network
 
-| Class             | Description col | Form col | Use for                     |
-|-------------------|-----------------|----------|-----------------------------|
-| `layout--equal`   | 56%             | 40%      | Default — petitions/forms.  |
-| `layout--reverse` | 30%             | 65%      | Long letters / big forms.   |
-| `layout--full`    | 100%            | 100%     | Single column.              |
+1. Upload the **logo** to AN **user_files**; copy its URL into the wrapper
+   (CONFIG: LOGO) — or set it in the tool.
+2. Theme the tokens + font `<link>` (or use the tool).
+3. In AN, create/edit the page-wrapper template and paste the Header + Footer
+   (the tool splits them at `<!-- END TEMPLATE HEADER - START WIDGET -->`).
+4. Ensure the widget embed uses `css=whitelabel`.
 
-## Deploying
+## Hosting the tool
 
-1. Upload the **logo** to AN **user_files**; copy its URL into `wrapper.html`
-   (CONFIG: LOGO).
-2. Theme the tokens in the `<style>` block (CONFIG: COLOURS+FONTS) and font
-   `<link>`.
-3. In AN, create/edit the page-wrapper template and paste the **whole**
-   `wrapper.html`. AN injects the action widget at the
-   `<!-- END TEMPLATE HEADER - START WIDGET -->` marker.
-4. Ensure the widget embed uses `css=whitelabel` (see Approach above).
-
-To update styling later: edit the `<style id="anw-embed-css">` block (or the
-inline JS) in `wrapper.html`, re-paste the whole file into the AN page-wrapper
-template, and check it in AN's **Preview**.
+`generator.html` is a static file served from GitHub Pages (`main` branch,
+root). To update: edit, **re-bake if `wrapper.html` changed**, commit, push.
+Pages rebuilds in ~1–2 min. The Webflow page frames it via `webflow-embed.html`;
+the iframe auto-grows to the tool's height via `postMessage`. The section
+sidebar shows in the embed when the container is ≥ 860px wide and folds away
+below that.
 
 ## Notes / gotchas
 
-- **Fundraiser pages:** the donation widget renders inside a same-origin iframe
-  whose document AN **replaces** after its widget JS runs. The injection module
-  (see above) re-reads `contentDocument` and re-injects the brand CSS + font on
-  the iframe's `load` event so the inside of the iframe matches the wrapper.
-  Stripe owns the actual card fields, so those keep their processor styling. The
-  card *around* the iframe is styled by the wrapper either way.
-- All CSS is scoped under `.an-homepage-embed` so nothing leaks into host-site
-  embeds.
-- This template descends from the Reunite Families UK build (which used the
-  override approach). The RFUK code under
-  `…/Reunite Families/Code/` is kept only as reference.
+- **Cross-origin embed:** the tool (github.io) inside the Webflow page is
+  cross-origin, so sidebar section links open + highlight a section but can't
+  scroll the parent page to it. True click-to-scroll would need a small
+  `postMessage` handshake.
+- **Fundraiser pages:** Stripe owns the card fields, so those keep processor
+  styling; the card *around* the iframe is styled by the wrapper.
+- This template descends from the Reunite Families UK build (which used a CSS
+  *override* approach rather than whitelabel); that code is reference only.
