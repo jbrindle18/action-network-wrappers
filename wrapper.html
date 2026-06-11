@@ -71,13 +71,17 @@
     --heading-transform: none;          /* uppercase | none */
     --button-transform: uppercase;      /* button text only */
 
-    /* COLOURS */
-    --brand:            #0e7a43;
-    --brand-hover:      #0a5c33;
+    /* COLOURS — the old single "brand colour" is split into its specific uses */
+    --button-bg:        #0e7a43;   /* action / submit button background */
+    --button-text:      #ffffff;   /* action / submit button text */
+    --button-bg-hover:  #0a5c33;   /* button background on hover */
+    --progress-bar:     #0e7a43;   /* petition / fundraiser progress bar + total */
+    --heading-accent:   #0e7a43;   /* coloured main heading (entry title) */
     --link:             #0e7a43;
     --text:             #000000;
     --heading:          #000000;
     --required:         #0a5c33;
+    --graytext:         #767676;   /* "Target:" + other AN .graytext helper text */
 
     --page-bg:          #f4f4f6;
     --header-bg:        #ffffff;
@@ -112,6 +116,19 @@
     --logo-max-height:  40px;
     --logo-max-width:   180px;
   }
+
+  /* CONFIG: FONT-FACE — self-hosted / non-Google fonts.
+     Add one @font-face per weight (and per family), then set --font-body /
+     --font-heading above to the family name. Because this whole <style> block is
+     also injected into AN's donation iframe, fonts declared here load there too —
+     no <link> needed. Use this INSTEAD of the Google Fonts <link> in the head
+     (clear the "Google Fonts URL" in the tool when you use custom fonts).
+     Example with multiple fonts / weights:
+       @font-face{font-family:"Aktiv Grotesk";src:url("https://YOURHOST/aktiv-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+       @font-face{font-family:"Aktiv Grotesk";src:url("https://YOURHOST/aktiv-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+       @font-face{font-family:"Tiempos Text";src:url("https://YOURHOST/tiempos-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap} */
+  /* @font-face:start */
+  /* @font-face:end */
 
   /* 1. BASE */
   .an-homepage-embed {
@@ -239,7 +256,7 @@
     margin-bottom: 16px !important;
     border-bottom: none !important;
     padding-bottom: 0 !important;
-    color: var(--brand);
+    color: var(--heading-accent);
   }
   .an-homepage-embed #can_embed_form .main_action_image { margin-bottom: 16px !important; }
 
@@ -317,8 +334,8 @@
   .an-homepage-embed #can_embed_form .button,
   .an-homepage-embed #donate_auto_modal input[type="submit"],
   .an-homepage-embed #donate_auto_modal .button {
-    background-color: var(--brand);
-    color: #fff;
+    background-color: var(--button-bg);
+    color: var(--button-text);
     border-radius: var(--button-radius);
     font-size: 20px; font-weight: 700;
     text-transform: var(--button-transform);
@@ -329,7 +346,7 @@
   .an-homepage-embed #can_embed_form input[type="submit"]:hover,
   .an-homepage-embed #can_embed_form .button:hover,
   .an-homepage-embed #donate_auto_modal input[type="submit"]:hover,
-  .an-homepage-embed #donate_auto_modal .button:hover { background-color: var(--brand-hover); color: #fff; }
+  .an-homepage-embed #donate_auto_modal .button:hover { background-color: var(--button-bg-hover); color: var(--button-text); }
 
   /* 10. LINKS */
   .an-homepage-embed a { color: var(--link); text-decoration: none; }
@@ -339,16 +356,18 @@
   .an-homepage-embed .action_status_tracker { text-align: center; margin-bottom: 12px; }
   .an-homepage-embed .action_status_running_total {
     font-family: var(--font-heading); font-size: 1em; font-weight: 700 !important;
-    color: var(--brand) !important; margin-bottom: 6px;
+    color: var(--progress-bar) !important; margin-bottom: 6px;
   }
   .an-homepage-embed .action_status_status_bar {
     display: block; width: 100%; height: 10px; border-radius: 5px;
     background: #e0e0e0; overflow: hidden; margin: 0 0 6px;
   }
   .an-homepage-embed #can_embed_form .action-widget--toggle .action_status_status_bar span.action_status_status_bar-grow {
-    background: var(--brand) !important;
+    background: var(--progress-bar) !important;
   }
-  .an-homepage-embed .action_status_goal { font-size: 0.8em; color: #888; margin-bottom: 12px; }
+  .an-homepage-embed .action_status_goal { font-size: 0.8em; color: var(--graytext); margin-bottom: 12px; }
+  /* "Target: N signatures" and AN's other muted helper text. */
+  .an-homepage-embed #can_embed_form .graytext { color: var(--graytext); }
   .an-homepage-embed #can_embed_form_inner.survey_int #survey_questions_footer button {
     height: auto !important; padding-top: 12px !important; padding-bottom: 12px !important;
   }
@@ -517,7 +536,7 @@
   .an-homepage-embed .share-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
   .an-homepage-embed .share-btn {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 22px; border-radius: 25px; border: none; color: #fff;
+    padding: 10px 22px; border-radius: var(--button-radius); border: none; color: #fff;
     font-size: 14px; font-weight: 500; font-family: inherit;
     cursor: pointer; text-decoration: none;
     transition: opacity .2s ease, transform .1s ease;

@@ -78,12 +78,41 @@ thing to check.
 
 Everything tweakable is searchable by the keyword **`CONFIG`**.
 
-### Colours + fonts
+### Colours
 Edit **Section 0 (THEME TOKENS)** at the top of `<style id="anw-embed-css">` —
-brand colour, text, card, inputs, statement box, footer, radii. Then update the
-Google Fonts `<link>` (CONFIG: FONTS) to match `--font-body` / `--font-heading`;
-request only the weights you use. Default palette is green
-(`--brand: #0e7a43`, hover `#0a5c33`).
+text, card, inputs, statement box, footer, radii, etc. Default palette is green.
+
+The old single "brand colour" is **split into its specific uses**, so each can be
+themed independently:
+
+| Token | Controls |
+|-------|----------|
+| `--button-bg` | Action / submit button background |
+| `--button-text` | Action / submit button text |
+| `--button-bg-hover` | Button background on hover |
+| `--progress-bar` | Petition / fundraiser progress bar + running total |
+| `--heading-accent` | Coloured main heading (entry title) |
+| `--graytext` | "Target:" line and AN's other `.graytext` helper text |
+
+### Fonts
+Set the families in `--font-body` / `--font-heading`, then load them one of two
+ways:
+
+- **Google Fonts** — update the `<link>` in the head (CONFIG: FONTS) and
+  `ANW.fontUrl` to match; request only the weights you use. (In the tool: the
+  "Google Fonts URL" box in the Fonts section.)
+- **Self-hosted / non-Google fonts (incl. multiple)** — add `@font-face` rules in
+  the **CONFIG: FONT-FACE** block (just below Section 0). One `@font-face` per
+  weight; paste several blocks for several families; then point the `--font-*`
+  tokens at the family names. Because the whole `<style>` block is also injected
+  into AN's donation iframe, these fonts load there too — no `<link>` needed.
+  Clear the Google Fonts URL when you use this (the tool/​generator then drops the
+  Google `<link>` automatically). Example:
+
+  ```css
+  @font-face{font-family:"Aktiv Grotesk";src:url("https://YOURHOST/aktiv-400.woff2") format("woff2");font-weight:400;font-display:swap}
+  @font-face{font-family:"Aktiv Grotesk";src:url("https://YOURHOST/aktiv-700.woff2") format("woff2");font-weight:700;font-display:swap}
+  ```
 
 ### Logo
 CONFIG: LOGO — set the `<img>` `src` + `alt` and the home link. The logo is the
