@@ -269,9 +269,11 @@
             <code>wrapper.html</code> file. That's your saved copy: keep it as a
             backup, hand it to someone else, or reopen it later to change the
             colours.</li>
-          <li><b>Import saved wrapper…</b> — opens a <code>wrapper.html</code> you
-            saved earlier and reads its colours, fonts, logo and share options
-            back into the form, so you can pick up where you left off and edit.</li>
+          <li><b>Import saved wrapper…</b> — reads the colours, fonts, logo,
+            layout and share options out of a <code>wrapper.html</code> you saved
+            earlier and applies them to the <b>latest</b> template here. You keep
+            any improvements made to the tool since you saved — only your settings
+            are imported, not the old file.</li>
         </ul>
 
         <div class="bio">
@@ -415,31 +417,39 @@ var CONFIG = {
 };
 var SHARE_NETS = ["whatsapp","facebook","x","bluesky","linkedin","copy"];
 
-function readConfigFromMaster(){
-  CONFIG.favicon  = readAnchor(/<link rel="icon" href="([^"]*)"/);
-  CONFIG.fontUrl  = readAnchor(/fontUrl:\s*"([^"]*)"/) ||
-                    readAnchor(/<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com\/css2[^"]*)"/);
-  var ffm = MASTER.match(/\/\* @font-face:start \*\/([\s\S]*?)\/\* @font-face:end \*\//);
-  CONFIG.fontFace = ffm ? ffm[1].trim() : "";
-  CONFIG.logoHref = readAnchor(/<div id="gen_header">[\s\S]*?<a href="([^"]*)"/);
-  CONFIG.logoSrc  = readAnchor(/<div id="gen_header">[\s\S]*?<img src="([^"]*)"/);
-  CONFIG.logoAlt  = readAnchor(/<div id="gen_header">[\s\S]*?<img[^>]*alt="([^"]*)"/);
-  CONFIG.layout   = readAnchor(/gen_wrapper (layout--\w+)/) || "layout--equal";
-  CONFIG.recurringPretick      = /recurringPretick:\s*true/.test(MASTER);
-  CONFIG.hideFundraiserSidebar = /hideFundraiserSidebar:\s*true/.test(MASTER);
-  CONFIG.hideSponsoredBy       = /hideSponsoredBy:\s*true/.test(MASTER);
-
-  /* share widget */
-  CONFIG.shareButtons = /shareButtons:\s*true/.test(MASTER);
-  CONFIG.shareLabel   = readAnchor(/shareLabel:\s*"([^"]*)"/);
-  var spm = MASTER.match(/sharePlatforms:\s*\{([\s\S]*?)\}/);
+/* Extract the user's settings (logo, fonts, layout, modules, share, footer)
+   from ANY wrapper text — used both for the baked master and for an imported
+   saved wrapper. Returns a plain object; does not touch global CONFIG. */
+function readConfigFrom(SRC){
+  function rd(re, group){ group=group||1; var m=SRC.match(re); return m?m[group]:""; }
+  var cfg = { share:{} };
+  cfg.favicon  = rd(/<link rel="icon" href="([^"]*)"/);
+  cfg.fontUrl  = rd(/fontUrl:\s*"([^"]*)"/) ||
+                 rd(/<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com\/css2[^"]*)"/);
+  var ffm = SRC.match(/\/\* @font-face:start \*\/([\s\S]*?)\/\* @font-face:end \*\//);
+  cfg.fontFace = ffm ? ffm[1].trim() : "";
+  cfg.logoHref = rd(/<div id="gen_header">[\s\S]*?<a href="([^"]*)"/);
+  cfg.logoSrc  = rd(/<div id="gen_header">[\s\S]*?<img src="([^"]*)"/);
+  cfg.logoAlt  = rd(/<div id="gen_header">[\s\S]*?<img[^>]*alt="([^"]*)"/);
+  cfg.layout   = rd(/gen_wrapper (layout--\w+)/) || "layout--equal";
+  cfg.recurringPretick      = /recurringPretick:\s*true/.test(SRC);
+  cfg.hideFundraiserSidebar = /hideFundraiserSidebar:\s*true/.test(SRC);
+  cfg.hideSponsoredBy       = /hideSponsoredBy:\s*true/.test(SRC);
+  cfg.shareButtons = /shareButtons:\s*true/.test(SRC);
+  cfg.shareLabel   = rd(/shareLabel:\s*"([^"]*)"/);
+  var spm = SRC.match(/sharePlatforms:\s*\{([\s\S]*?)\}/);
   var spBody = spm ? spm[1] : "";
-  SHARE_NETS.forEach(function(k){
-    CONFIG.share[k] = new RegExp(k+":\\s*true").test(spBody);
-  });
-
-  var fm = MASTER.match(/<div id="gen_footer">([\s\S]*?)<\/div>\s*<\/body>/);
-  CONFIG.footerHtml = fm ? fm[1].trim() : "";
+  SHARE_NETS.forEach(function(k){ cfg.share[k] = new RegExp(k+":\\s*true").test(spBody); });
+  var fm = SRC.match(/<div id="gen_footer">([\s\S]*?)<\/div>\s*<\/body>/);
+  cfg.footerHtml = fm ? fm[1].trim() : "";
+  return cfg;
+}
+function readConfigFromMaster(){
+  var c = readConfigFrom(MASTER);
+  for(var k in c){
+    if(k==="share"){ for(var s in c.share) CONFIG.share[s] = c.share[s]; }
+    else CONFIG[k] = c[k];
+  }
 }
 
 /* ---- build the themed wrapper ----------------------------------------- */
@@ -785,6 +795,48 @@ function onMasterLoaded(text, sourceLabel){
   renderForm();
 }
 
+/* Legacy token names → where their value should flow in the CURRENT template.
+   Lets an old saved wrapper's colours land on the new split tokens. */
+var LEGACY_TOKEN_MAP = {
+  "brand":       ["button-bg","progress-bar","heading-accent"],
+  "brand-hover": ["button-bg-hover"]
+};
+
+/* Import a saved wrapper as SETTINGS ONLY: read its colours/fonts/logo/layout/
+   modules/share/footer and apply them onto the CURRENT baked template, so the
+   user keeps every later improvement to the wrapper. (Contrast onMasterLoaded,
+   which adopts a file as the whole template — used only as a boot fallback.) */
+function importSettings(text){
+  if(!MASTER){ onMasterLoaded(text); return; }           // no template yet → load as master
+  var imported = parseTokens(text);
+  if(!imported.length){ flash($("loadBtn"), "Not a wrapper file"); return; }
+
+  var imap = {};
+  imported.forEach(function(t){ imap[t.key] = t.value; });
+
+  /* 1. copy values for tokens that still exist in the current template */
+  TOKENS.forEach(function(t){ if(imap[t.key] !== undefined) t.value = imap[t.key]; });
+
+  /* 2. migrate renamed/removed tokens (only when the new token wasn't itself
+        present in the import, so a newer file's explicit values still win) */
+  for(var legacy in LEGACY_TOKEN_MAP){
+    if(imap[legacy] === undefined) continue;
+    LEGACY_TOKEN_MAP[legacy].forEach(function(nk){
+      if(imap[nk] === undefined) setToken(nk, imap[legacy]);
+    });
+  }
+
+  /* 3. copy the user's non-token settings */
+  var ic = readConfigFrom(text);
+  ["logoSrc","logoAlt","logoHref","favicon","fontUrl","fontFace","layout","footerHtml",
+   "recurringPretick","hideFundraiserSidebar","hideSponsoredBy","shareButtons","shareLabel"
+  ].forEach(function(k){ if(ic[k] !== undefined) CONFIG[k] = ic[k]; });
+  SHARE_NETS.forEach(function(k){ if(ic.share[k] !== undefined) CONFIG.share[k] = ic.share[k]; });
+
+  renderForm();
+  flash($("loadBtn"), "Settings imported ✓");
+}
+
 /* UTF-8-safe base64 (handles £, em-dashes, etc.) */
 function b64encodeUtf8(str){ return btoa(unescape(encodeURIComponent(str))); }
 function b64decodeUtf8(b64){ return decodeURIComponent(escape(atob(b64.replace(/\s+/g,"")))); }
@@ -807,13 +859,19 @@ function loadEmbedded(){
 }
 
 /* events */
-$("pickBtn").addEventListener("click",function(){$("filePick").click();});
-$("loadBtn").addEventListener("click",function(){$("filePick").click();});
+var pickMode = "merge";   // "master" = boot fallback (adopt file as template),
+                          // "merge"  = import settings onto the current template
+$("pickBtn").addEventListener("click",function(){ pickMode="master"; $("filePick").click(); });
+$("loadBtn").addEventListener("click",function(){ pickMode="merge";  $("filePick").click(); });
 $("filePick").addEventListener("change",function(e){
   var f=e.target.files[0]; if(!f) return;
   var rd=new FileReader();
-  rd.onload=function(){onMasterLoaded(rd.result, f.name+" (loaded)");};
+  rd.onload=function(){
+    if(pickMode==="master") onMasterLoaded(rd.result, f.name+" (loaded)");
+    else importSettings(rd.result);
+  };
   rd.readAsText(f);
+  e.target.value="";   // let the same file be re-imported
 });
 $("copyHeaderBtn").addEventListener("click",copyHeader);
 $("copyFooterBtn").addEventListener("click",copyFooter);

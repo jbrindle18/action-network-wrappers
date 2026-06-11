@@ -55,7 +55,11 @@ is UTF-8-safe (handles £, em-dashes, etc.).
    (In AN: Start Organizing → your group → Page wrappers → new/edit wrapper.)
 3. Save in AN; set your action to use that wrapper.
 4. **Save Wrapper** keeps a `wrapper.html` file. Next time, **Import Saved
-   Wrapper** reloads all its settings so you can pick up where you left off.
+   Wrapper** reads its settings (colours, fonts, logo, layout, modules, share,
+   footer) and applies them onto the **latest** template — so you keep every
+   later fix/feature instead of resurrecting the old file. Renamed tokens are
+   migrated automatically (e.g. an old single brand colour fans out to the new
+   button / progress-bar / heading colours).
 
 Always check the result in AN's own page-wrapper **Preview** before going live.
 
