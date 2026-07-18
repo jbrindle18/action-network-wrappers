@@ -31,6 +31,7 @@ because GitHub Pages serves `main` and Webflow just frames it.
 | `rebake.py` | Refreshes the base64 copy of `wrapper.html` inside `generator.html`. **Run after every `wrapper.html` edit** (see below). |
 | `webflow-embed.html` | The `<iframe>` + auto-resize snippet to paste into a Webflow Embed element. |
 | `Centrul Filia Wrapper.html` | A real themed wrapper (Centrul Filia), kept as a worked example. |
+| `previews/` | Static, sanitized snapshots of AN's own widget markup (currently just `petition.html`), fetched by `generator.html`'s live preview pane and restyled in place as you edit. Not baked in — the tool fetches these at runtime, same as it fetches AN's own base whitelabel CSS. |
 | `README.md` | This file. |
 
 ## How it works — whitelabel base + brand layer
@@ -78,25 +79,50 @@ Then commit **both** `wrapper.html` and `generator.html` together. If you ever
 see the tool produce stale output, an un-baked `wrapper.html` edit is the first
 thing to check.
 
+## Live preview — a second maintenance note
+
+The generator's preview pane renders a real, **static** capture of AN's own
+widget markup (`previews/petition.html`), not a live AN embed. If Action
+Network changes the structure of that widget (new field, new class, new
+wrapper div), the preview can drift out of sync with reality even though
+`wrapper.html` itself still works correctly against the real thing. If the
+preview looks wrong: re-capture a fresh embed (format=js&source=widget&style=full,
+with `style-embed-whitelabel-v3.css` linked, no custom wrapper), strip the
+single-use CSRF/anti-bot tokens and `<script>` tags, add `onsubmit="return
+false"` to the form, and replace `previews/petition.html`. This has no effect
+on Copy Header/Footer/Save/Import — those never touch the preview fixture.
+
 ## Editing `wrapper.html` by hand (advanced)
 
 Everything tweakable is searchable by the keyword **`CONFIG`**.
 
 ### Colours
-Edit **Section 0 (THEME TOKENS)** at the top of `<style id="anw-embed-css">` —
-text, card, inputs, statement box, footer, radii, etc. Default palette is green.
-
-The old single "brand colour" is **split into its specific uses**, so each can be
-themed independently:
+Edit **Section 0 (THEME TOKENS)** at the top of `<style id="anw-embed-css">`.
+Default palette is green. The colour system is deliberately small — 10 tokens
+cover the whole theme:
 
 | Token | Controls |
 |-------|----------|
+| `--body` | Body text **and** headings |
+| `--accent` | Entry-title heading, progress bar + running total, links, required-field mark, input focus outline |
 | `--button-bg` | Action / submit button background |
 | `--button-text` | Action / submit button text |
-| `--button-bg-hover` | Button background on hover |
-| `--progress-bar` | Petition / fundraiser progress bar + running total |
-| `--heading-accent` | Coloured main heading (entry title) |
-| `--graytext` | "Target:" line and AN's other `.graytext` helper text |
+| `--input-border` | Input field border |
+| `--page-bg` | Page background |
+| `--card-bg` | The form's own card ("Form colour") |
+| `--header-bg` | Header bar background |
+| `--footer-bg` | Footer background |
+| `--footer-text` | Footer text |
+
+Everything else (button hover, divider lines, the form card's border, the
+quote-box accent bar and background, loading skeleton, shadow, placeholder
+and helper-text grey) is declared in **Section 0b (DERIVED / STANDARD)**
+right below Section 0 — either computed from the 10 tokens above via CSS
+`color-mix()` (e.g. the divider is a lighter tint of `--accent`) or a fixed
+brand-neutral value. Section 0b is a deliberately separate `.an-homepage-embed
+{ }` rule: the generator tool only parses the *first* such rule for editable
+fields, so anything in Section 0b stays out of the UI on purpose — it's not
+meant to be set directly.
 
 ### Fonts
 Set the families in `--font-body` / `--font-heading`, then load them one of two
@@ -187,5 +213,18 @@ below that.
   `postMessage` handshake.
 - **Fundraiser pages:** Stripe owns the card fields, so those keep processor
   styling; the card *around* the iframe is styled by the wrapper.
+- **`.action_letter` (the "letter to target" box) has a hidden decorative
+  element:** AN renders a `::before` pseudo-element on it — a 12px grey
+  "folded corner" strip — completely independent of the `border` property. If
+  you accent that box's border (e.g. a coloured `border-left`), this strip
+  still shows and reads as a second, conflicting border. Hide it explicitly:
+  `.action_letter::before { display: none !important; }`.
+- **SVG logo renders as 0×0:** if you size a logo `<img>` with only
+  `max-height` (no `max-width`, no explicit `height`) and the source SVG has
+  no `width`/`height` attributes (only a `viewBox`), some renderers can't
+  resolve `width: auto` against it and the image collapses to nothing. Set an
+  explicit `height` (not `max-height`) when sizing a lone image this way — the
+  header logo already does this safely via `max-height` **+** `max-width`
+  together, which doesn't hit the bug.
 - This template descends from the Reunite Families UK build (which used a CSS
   *override* approach rather than whitelabel); that code is reference only.
