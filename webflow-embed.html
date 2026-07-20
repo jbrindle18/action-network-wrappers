@@ -13,7 +13,7 @@
   3. Paste EVERYTHING below into that Embed element.
   4. The src is already set to your GitHub Pages URL:
      https://jbrindle18.github.io/action-network-wrappers/generator.html
-  5. Publish. The iframe auto-grows to fit the tool as the user works.
+  5. Publish.
 
   NOTES
   - allow="clipboard-write"  lets the Copy header / Copy footer buttons
@@ -23,28 +23,18 @@
     permits both. If you choose to add a sandbox attribute, you must
     include: allow-scripts allow-same-origin allow-downloads
     allow-popups allow-forms — or those features will break.
-  - The 1200px height is just a starting value; the script below resizes
-    the iframe to the tool's real height as soon as it reports in.
+  - The tool is a fixed-height, self-contained "app" (100vh internally,
+    with its own sections scrolling inside it) rather than a growing block
+    of content — it does NOT auto-resize the iframe to fit. Set the height
+    below to whatever fits your page (85vh is a reasonable default; a fixed
+    px value like 800px also works). If you need it taller/shorter, just
+    change the height in the style attribute.
 ============================================================ -->
 
 <iframe
   id="anwGen"
   src="https://jbrindle18.github.io/action-network-wrappers/generator.html"
   title="Action Network Wrapper Generator"
-  style="width:100%;border:0;display:block;height:1200px;"
+  style="width:100%;border:0;display:block;height:85vh;"
   allow="clipboard-write"
   loading="lazy"></iframe>
-
-<script>
-(function () {
-  var frame = document.getElementById("anwGen");
-  if (!frame) return;
-  window.addEventListener("message", function (e) {
-    /* Optional hardening: also check e.origin === "https://YOUR-HOSTED-URL" */
-    var h = e && e.data && e.data.anwGenHeight;
-    if (typeof h === "number" && h > 0) {
-      frame.style.height = h + "px";
-    }
-  });
-})();
-</script>
