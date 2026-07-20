@@ -178,10 +178,6 @@
     font-size:12px;letter-spacing:0;color:var(--g-ink);flex:0 0 auto;
   }
   .grouphead .gname{flex:1}
-  .grouphead .mod{
-    font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:400;font-size:11px;
-    letter-spacing:.02em;color:var(--g-mut);text-transform:none;flex:0 0 auto;
-  }
   .group .body{padding:13px 16px 18px}
 
   .field{margin:13px 0}
@@ -266,11 +262,6 @@
   }
   .info-panel .caveat b{font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 
-  /* Plain-language field label + small raw-token hint */
-  .field>label .tok{
-    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;
-    color:#b0b0b0;font-weight:400;margin-left:6px;text-transform:none;letter-spacing:0;
-  }
   .subhead{
     font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
     color:var(--g-ink);margin:14px 0 2px;
@@ -439,9 +430,8 @@ function labelFor(key){
   return TOKEN_LABEL[key] ||
     key.replace(/-/g," ").replace(/\b\w/g,function(c){return c.toUpperCase();});
 }
-/* friendly label + small muted raw-token hint */
 function tokLabel(key){
-  return '<label>'+esc(labelFor(key))+'<span class="tok">--'+key+'</span></label>';
+  return '<label>'+esc(labelFor(key))+'</label>';
 }
 var TOKEN_GROUP = {
   "font-body":"fonts","font-heading":"fonts","heading-weight":"fonts",
@@ -1020,11 +1010,6 @@ function renderForm(){
       '<div class="hint">Plain text + links. Delete to keep the placeholder.</div></div>'
   );
 
-  var MODTAG = {
-    identity:"IDENTITY_MODULE", fonts:"TYPE_MODULE", colours:"COLOR_MODULE",
-    shape:"SHAPE_MODULE", layout:"LAYOUT_MODULE",
-    share:"SHARE_MODULE", footer:"FOOTER_MODULE"
-  };
   /* Inline stroke icons (Feather-style) for the sidebar nav - no font dependency */
   var SVG = function(p){ return '<svg class="snav-ic" viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>'; };
   var NAVICON = {
@@ -1055,7 +1040,6 @@ function renderForm(){
              '<div class="grouphead">'+
                '<span class="num">'+n+'</span>'+
                '<span class="gname">'+g[0]+'</span>'+
-               '<span class="mod">'+(MODTAG[g[1]]||"")+'</span>'+
              '</div>'+
              '<div class="body">'+items.join("")+'</div></section>';
   }).join("");
