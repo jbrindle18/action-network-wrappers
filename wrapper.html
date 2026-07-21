@@ -83,10 +83,8 @@
     --page-bg:          #f4f4f6;
     --header-bg:        #ffffff;
     --footer-bg:        #111111;
-    --footer-text:      #ffffffd9;
+    --footer-text:      #d9d9d9;
     --card-bg:          #ffffff;   /* the form's own card ("Form colour") */
-
-    --hover-opacity:    .85;
 
     /* SHAPE / SIZING */
     --card-radius:      8px;
@@ -110,7 +108,7 @@
   .an-homepage-embed {
     --button-bg-hover:  color-mix(in srgb, var(--button-bg) 82%, black);
     --divider:          color-mix(in srgb, var(--accent) 25%, white);
-    --card-border:      color-mix(in srgb, var(--accent) 20%, white);
+    --card-border:      #e0e0e0;   /* fixed neutral - doesn't follow Accent */
     --statement-bar:    var(--accent);
     --statement-bg:     color-mix(in srgb, var(--accent) 6%, white);
 
@@ -119,6 +117,7 @@
     --input-bg:         #ffffff;
     --skeleton:         #ebebeb;
     --card-shadow:      0 30px 60px -15px #232f4a14;
+    --hover-opacity:    .85;
   }
 
   /* CONFIG: FONT-FACE - self-hosted / non-Google fonts.
@@ -264,6 +263,16 @@
   }
   .an-homepage-embed #can_embed_form blockquote::before,
   .an-homepage-embed #can_embed_form q::before { display: none !important; }
+  /* 5b. LETTER TO TARGET ("action_letter") - AN doesn't wrap this in an
+     actual blockquote/q, so it gets none of the quote-box theming above by
+     default; give it the same accent-bar treatment explicitly. AN also
+     renders a decorative ::before "folded corner" strip on this box,
+     independent of the border property - hide it, or it shows through as
+     a second, conflicting border once ours is coloured. */
+  .an-homepage-embed #can_embed_form .action_letter {
+    border-left: 4px solid var(--accent);
+  }
+  .an-homepage-embed #can_embed_form .action_letter::before { display: none !important; }
   .an-homepage-embed #can_embed_form #can_sidebar .action_sidebar > h4,
   .an-homepage-embed #can_embed_form #can_sidebar > h4 {
     background: none; border: 0; border-radius: 0; padding: 0;
