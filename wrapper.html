@@ -54,8 +54,8 @@
 
   <!-- CONFIG: FONTS - loaded async (media=print swap) so it doesn't block render.
        Request only the weights you use. Keep family in sync with --font-* tokens. -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&display=swap"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap"></noscript>
 
   <!-- =======================================================================
        BRAND STYLES (inline). Edit Section 0 tokens to re-theme.
@@ -65,9 +65,9 @@
   /* 0. THEME TOKENS - CONFIG: COLOURS+FONTS. The only part you normally edit. */
   .an-homepage-embed {
     /* FONTS - must match the font <link> above */
-    --font-body:        "Libre Franklin", Arial, sans-serif;
-    --font-heading:     "Libre Franklin", Arial, sans-serif;
-    --heading-weight:   700;
+    --font-body:        "DM Sans", sans-serif;
+    --font-heading:     "DM Sans", sans-serif;
+    --heading-weight:   900;
     --heading-transform: none;          /* uppercase | none */
     --button-transform: uppercase;      /* button text only */
 
@@ -75,15 +75,15 @@
        Everything else is either fixed (loading skeleton, shadow, etc) or
        computed FROM these via color-mix() - see the DERIVED block below. */
     --body:             #000000;   /* body text AND headings */
-    --accent:           #0e7a43;   /* entry-title heading, progress bar + total, links, required-field mark, input focus outline */
-    --button-bg:        #0e7a43;   /* action / submit button background */
-    --button-text:      #ffffff;   /* action / submit button text */
+    --accent:           #2f4392;   /* entry-title heading, progress bar + total, links, required-field mark, input focus outline */
+    --button-bg:        #42fffc;   /* action / submit button background */
+    --button-text:      #000000;   /* action / submit button text */
     --input-border:     #000000;   /* input field border */
 
-    --page-bg:          #f4f4f6;
-    --header-bg:        #ffffff;
-    --footer-bg:        #111111;
-    --footer-text:      #d9d9d9;
+    --page-bg:          #fafeff;
+    --header-bg:        #2f4392;
+    --footer-bg:        #2f4392;
+    --footer-text:      #ffffff;
     --card-bg:          #ffffff;   /* the form's own card ("Form colour") */
 
     /* SHAPE / SIZING */
@@ -645,7 +645,7 @@
 
       /* Font stylesheet URL also loaded inside the fundraiser iframe so the
          donation form uses the brand font. Keep in sync with the <link> above. */
-      fontUrl: "https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&display=swap",
+      fontUrl: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap",
 
       /* Share buttons on the thank-you page.
          shareButtons   - master on/off for the whole widget.
