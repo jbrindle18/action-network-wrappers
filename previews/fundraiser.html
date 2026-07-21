@@ -1,0 +1,24 @@
+<!--
+Preview fixture - captured from a live Action Network v6 fundraiser/donation
+widget (embed params: format=js&source=widget&css=whitelabel&style=full).
+Captured from https://actionnetwork.org/fundraising/example-fundraiser-2/
+(Solidarity Studio example action), via the real widget embed snippet:
+  <script src='https://actionnetwork.org/widgets/v6/fundraising/example-fundraiser-2?format=js&source=widget&css=whitelabel&style=full'></script>
+  <div id='can-fundraising-area-example-fundraiser-2'>...</div>
+
+Unlike petition/event, a fundraiser's ACTUAL donation form renders inside a
+same-origin <iframe id="can_embed_iframe"> nested in this mount div (payment
+fields are isolated in their own document) - confirmed by capturing the real
+widget: the mount div here only ever contains that iframe shell. The real
+form content lives in previews/fundraiser-inner.html, which generator.html's
+initPreview() loads into this iframe's .srcdoc at runtime (see
+FIXTURES.fundraiser.innerFile). wrapper.html's own CSS/JS already expect
+this shape ([id^="can-fundraising-area"], iframe#can_embed_iframe) - this
+fixture's mount id keeps that exact prefix so those existing rules still
+apply.
+
+Used by generator.html's live preview pane (see initPreview()/syncPreview()).
+-->
+<div id="can-fundraising-area-preview" style="width: 100%">
+<iframe id="can_embed_iframe" style="width:100%;border:0;" title="Fundraiser donation form"></iframe>
+</div>

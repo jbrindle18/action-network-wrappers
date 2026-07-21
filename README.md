@@ -31,7 +31,7 @@ because GitHub Pages serves `main` and Webflow just frames it.
 | `rebake.py` | Refreshes the base64 copy of `wrapper.html` inside `generator.html`. **Run after every `wrapper.html` edit** (see below). |
 | `webflow-embed.html` | The `<iframe>` + auto-resize snippet to paste into a Webflow Embed element. |
 | `Centrul Filia Wrapper.html` | A real themed wrapper (Centrul Filia), kept as a worked example. |
-| `previews/` | Static, sanitized snapshots of AN's own widget markup (currently just `petition.html`), fetched by `generator.html`'s live preview pane and restyled in place as you edit. Not baked in — the tool fetches these at runtime, same as it fetches AN's own base whitelabel CSS. |
+| `previews/` | Static, sanitized snapshots of AN's own widget markup — `petition.html`, `event.html`, and the fundraiser pair `fundraiser.html` (outer mount + payment `<iframe>` shell) / `fundraiser-inner.html` (the payment form that goes inside it) — fetched by `generator.html`'s live preview pane and restyled in place as you edit. Not baked in — the tool fetches these at runtime, same as it fetches AN's own base whitelabel CSS. |
 | `README.md` | This file. |
 
 ## How it works — whitelabel base + brand layer
@@ -81,16 +81,40 @@ thing to check.
 
 ## Live preview — a second maintenance note
 
-The generator's preview pane renders a real, **static** capture of AN's own
-widget markup (`previews/petition.html`), not a live AN embed. If Action
-Network changes the structure of that widget (new field, new class, new
-wrapper div), the preview can drift out of sync with reality even though
-`wrapper.html` itself still works correctly against the real thing. If the
-preview looks wrong: re-capture a fresh embed (format=js&source=widget&style=full,
-with `style-embed-whitelabel-v3.css` linked, no custom wrapper), strip the
-single-use CSRF/anti-bot tokens and `<script>` tags, add `onsubmit="return
-false"` to the form, and replace `previews/petition.html`. This has no effect
-on Copy Header/Footer/Save/Import — those never touch the preview fixture.
+The generator's preview pane renders real, **static** captures of AN's own
+widget markup (`previews/petition.html`, `event.html`, `fundraiser.html` +
+`fundraiser-inner.html`), not a live AN embed. If Action Network changes the
+structure of a widget (new field, new class, new wrapper div), the preview
+can drift out of sync with reality even though `wrapper.html` itself still
+works correctly against the real thing. If a preview looks wrong, re-capture
+it:
+
+1. Get the real embed snippet for a test action of that type from AN
+   (`<script src="https://actionnetwork.org/widgets/v6/{type}/{slug}?format=js&source=widget&style=full">`
+   + its mount `<div>`, plus the `style-embed-whitelabel-v3.css` `<link>` AN
+   gives alongside it). **You can't just fetch or inject this URL from an
+   already-loaded page** — AN's widget script renders via `document.write()`,
+   which silently no-ops unless the `<script>` tag is part of a page's
+   *initial* HTML. Save a tiny scratch HTML file with the snippet and
+   navigate to it fresh.
+2. Read the mount div's `outerHTML` once AN's widget has rendered into it.
+3. Sanitize: strip anti-bot "challenge" `<script>` tags and their
+   `ch_challenge`/`ch_ns`/`ch_response` hidden inputs, replace the CSRF
+   `authenticity_token` value with a placeholder, add `onsubmit="return
+   false"` to every real `<form>`, normalize the mount div's id (except
+   fundraiser's outer mount — keep its `can-fundraising-area-…` prefix, since
+   `wrapper.html`'s own CSS/JS key off it).
+4. **Fundraiser only:** its donation form actually renders inside a nested
+   same-origin `<iframe id="can_embed_iframe">`, not inline. Capture that
+   separately — the outer capture only contains the iframe shell
+   (`fundraiser.html`); navigate directly to the iframe's own `src` URL to
+   capture the payment form itself (`fundraiser-inner.html`), and bake
+   `class="an-homepage-embed can_fundraising_widget"` onto its root so the
+   preview's colour sync doesn't have to wait on `wrapper.html`'s own
+   iframe-injection polling loop.
+
+This has no effect on Copy Header/Footer/Save/Import — those never touch the
+preview fixtures.
 
 ## Editing `wrapper.html` by hand (advanced)
 

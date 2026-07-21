@@ -230,6 +230,19 @@
     overflow: hidden;
   }
 
+  /* 4a. FUNDRAISER - the whole widget (main col + sidebar together) renders
+     inside ONE iframe inside the [id^="can-fundraising-area"] mount div
+     above, which already gets the card border/shadow. #can_sidebar picking
+     up the same card treatment from rule 4 above (it matches
+     .can_embed #can_embed_form > .clearfix #can_sidebar just as much on a
+     fundraiser as elsewhere) doubles it up - a bordered, shadowed box nested
+     inside another one. Cancel the border/shadow here specifically; keep the
+     background + padding so it doesn't look cramped against the card edge. */
+  .an-homepage-embed.can_fundraising_widget #can_embed_form > .clearfix #can_sidebar {
+    border: none;
+    box-shadow: none;
+  }
+
   /* 4b. FUNDRAISER sidebar-hide [MODULE - enable via ANW.hideFundraiserSidebar].
      Needs the iframe injector: it adds .an-hide-sidebar to the iframe <body>. */
   .an-homepage-embed.can_fundraising_widget.an-hide-sidebar #can_sidebar { display: none !important; }

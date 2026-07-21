@@ -1,0 +1,286 @@
+<!--
+Preview fixture - the content of a fundraiser widget's nested payment
+<iframe id="can_embed_iframe"> (see previews/fundraiser.html for the outer
+mount div). Captured the same session, same source action, as part of the
+same widget render - this is what was actually inside that iframe.
+
+Sanitized for reuse as a static fixture:
+- The two anti-bot "challenge" <script> tags (nonce'd, single-use) and their
+  ch_challenge/ch_ns/ch_response hidden inputs are removed.
+- The CSRF authenticity_token value is replaced with a placeholder.
+- The form has onsubmit="return false" so it can never actually POST to
+  Action Network from inside the tool.
+- class="an-homepage-embed can_fundraising_widget" is baked directly onto
+  the real <body> tag (this file is a full document, not a bare fragment -
+  that matters: wrapper.html's own injection script also does
+  doc.body.classList.add('an-homepage-embed') at runtime, and since
+  querySelector('.an-homepage-embed') returns the first match in document
+  order, a body-level class wins over a wrapper div one level in - putting
+  it on a nested div here previously meant generator.html's colour sync
+  found the wrong element). can_fundraising_widget is a class AN's real
+  widget already ships on this document's <body> - not something we add.
+
+If Action Network changes their widget markup, re-capture and re-sanitize
+this file the same way (see README.md).
+-->
+<body class="an-homepage-embed can_fundraising_widget">
+<div class="can_embed v6 can_fundraising_widget_full  fundraising fundraising_full full">
+
+<div id="can_embed_form" class="clearfix can_float can_768">
+<div class="clearfix">
+
+
+	<div id="can_main_col">
+
+		<h2 class="entry-title js-entry-title">Example Fundraiser</h2>
+		  <form accept-charset="UTF-8" action="/fundraising/example-fundraiser-2/donations" class="js-donate_form" id="donate_form" method="post" target="_parent" novalidate="novalidate" onsubmit="return false"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#10003;"><input name="authenticity_token" type="hidden" value="PREVIEW-ONLY-NOT-A-REAL-TOKEN"></div>
+		  <input type="hidden" name="version" value="v6">
+		  <input type="hidden" class="js-action_language" value="en">
+
+      <input class="js-currency" id="currency" name="currency" type="hidden" value="gbp">
+	  <input id="redirect" name="redirect" type="hidden">
+
+		<!-- The following has a class for the amount of options it has, donate_options5 -->
+		<div class="js-donate_amount_wrap donate_amount_wrap donate_options5 clearfix check_radio_field">
+	          <label class="donate_amount js-donate_amount">
+	            <input type="radio" class="required" name="donation[amount]" value="5"> £5
+	          </label>
+	          <label class="donate_amount js-donate_amount">
+	            <input type="radio" class="required" name="donation[amount]" value="10"> £10
+	          </label>
+	          <label class="donate_amount js-donate_amount">
+	            <input type="radio" class="required" name="donation[amount]" value="15"> £15
+	          </label>
+	          <label class="donate_amount js-donate_amount">
+	            <input type="radio" class="required" name="donation[amount]" value="20"> £20
+	          </label>
+	          <label class="donate_amount js-donate_amount other_label js-other_label">
+	            <input type="radio" class="required" name="donation[amount]" value="other">
+	            <input type="text" name="donation[custom_amount]" value="" size="35" placeholder="£ Other" class="donate_amount_custom js-donate_amount_custom other_input js-other_input number " min="1" autocomplete="really_off">
+	          </label>
+		</div>
+			<div class="donate_recurring js-donate_recurring mb40 clearfix">
+				<div class="donate_recurring_inner clearfix">
+		          <label>
+		            <input type="checkbox" name="donation[recurring]" class="donate_amount_recurring" value="true"> Make This Recurring
+		          </label>
+
+					<div class="clearfix can_relative can_block">
+						<select name="donation[recurring_period]" class="can_select hasCustomSelect" id="donate_recurring_period" style="appearance: menulist-button; width: 572px; position: absolute; opacity: 0; height: 44px; font-size: 16px;">
+	                <option value="recurring_weekly">Weekly</option>
+	                <option value="recurring_monthly">Monthly</option>
+	                <option value="recurring_three">Every 3 Months</option>
+	                <option value="recurring_yearly">Yearly</option>
+						</select><span class="can_select" style="display: inline-block;"><span class="can_selectInner" style="width: 530px; display: inline-block;">Weekly</span></span>
+					</div>
+
+				</div>
+			</div>
+	      <div id="donation_recipient_wrap" class="clearfix">
+	        <h5>Contributions will go to</h5>
+	        <div class="donation_recipients ">
+
+	            <div class="single_recipient clearfix">
+	              <a href="/groups/national-green-party-of-england-and-wales" target="_blank" class="recipient_avatar_link">
+	                <img src="https://can2-prod.s3.amazonaws.com/groups/photos/000/093/263/thumb/GPEW_logo_black_transparent.png" alt="Green Party of England &amp; Wales" class="avatar donation_avatar">
+	              </a>
+	              <div class="donation_info">
+	                <div class="donation_info_user"><a target="_blank" href="/groups/national-green-party-of-england-and-wales">Green Party of England &amp; Wales</a></div>
+
+	              </div>
+	              <input type="hidden" name="Group_93263" value="donate_split1">
+	          </div>
+	        </div>
+	      </div>
+		      <ul class="clearfix nofloat ">
+        <li class="cc_li_half js-cc_li_half">
+          <div class="floatlabel-wrapper "><label for="form-first_name" class="floatlabel-label floatlabel-label-inactive">First Name *</label><input type="text" size="35" class="required floatlabel-input" name="donation[first_name]" id="form-first_name" placeholder="First Name *" value=""></div>
+        </li>
+        <li class="cc_li_half js-cc_li_half">
+          <div class="floatlabel-wrapper "><label for="form-last_name" class="floatlabel-label floatlabel-label-inactive">Last Name *</label><input type="text" size="35" class="required floatlabel-input" name="donation[last_name]" id="form-last_name" placeholder="Last Name *" value=""></div>
+        </li>
+        <li class="cc_li_half js-cc_li_half">
+          <div class="floatlabel-wrapper "><label for="form-email" class="floatlabel-label floatlabel-label-inactive">Email *</label><input type="email" size="35" class="required floatlabel-input" name="donation[email]" id="form-email" placeholder="Email *" value=""></div>
+        </li>
+        <li class="cc_li_half js-cc_li_half">
+          <div class="floatlabel-wrapper "><label for="form-address" class="floatlabel-label floatlabel-label-inactive">Billing Address *</label><input type="text" size="35" class="required floatlabel-input" name="donation[address]" id="form-address" placeholder="Billing Address *" value=""></div>
+        </li>
+        <li class="cc_li_half js-cc_li_half clear">
+          <div class="floatlabel-wrapper "><label for="form-city" class="floatlabel-label floatlabel-label-inactive">City *</label><input type="text" size="35" class="required floatlabel-input" name="donation[city]" id="form-city" placeholder="City *" value=""></div>
+        </li>
+        <li class="cc_li_quarter">
+         <span id="cc_state_drop_wrap" class="js-cc_state_drop_wrap" style="display: none;">
+          <span class="donate_state">
+            <select class="can_select hasCustomSelect" id="form-state" name="donation[state]" style="appearance: menulist-button; width: 100px; position: absolute; opacity: 0; height: 44px; font-size: 16px;"><option value="">State *</option>
+</select><span class="can_select" style="display: inline-block;"><span class="can_selectInner" style="width: 100px; display: inline-block;">State *</span></span>
+          </span>
+         </span>
+          <span class="international_link-wrap js-international_link-wrap" style="display: none;">
+              <a class="international_link js-international_link">Not in the US?</a>
+          </span>
+          <span class="country_drop_wrap js-country_drop_wrap hide clear" style="display: block;">
+              <span class="block clear relative">
+                <select class="required can_select js-form-country hasCustomSelect" id="form-country" name="donation[country]" style="appearance: menulist-button; width: 135px; position: absolute; opacity: 0; height: 44px; font-size: 16px;"><option value="">Country *</option>
+<option value="GB" selected="selected">United Kingdom</option>
+<option value="US">United States</option></select><span class="can_select required js-form-country" style="display: inline-block;"><span class="can_selectInner" style="width: 93px; display: inline-block;">United Kingdom</span></span>
+              </span>
+          </span>
+          <input type="hidden" name="style" value="full">
+        </li>
+
+        <li class="cc_li_quarter">
+          <div class="floatlabel-wrapper "><label for="form-zip_code" class="floatlabel-label floatlabel-label-inactive">ZIP/Postal Code *</label><input type="text" size="35" class="required floatlabel-input" name="donation[zip_code]" id="form-zip_code" placeholder="ZIP/Postal Code *" value=""></div>
+        </li>
+        <li class="cc_li_third clear">
+          <div class="floatlabel-wrapper "><label for="form-card_number" class="floatlabel-label floatlabel-label-inactive">Credit Card Number *</label><input type="text" size="35" class="required_noname js-required_noname ignore js-form-card_number floatlabel-input" id="form-card_number" placeholder="Credit Card Number *"></div>
+        </li>
+        <li class="cc_li_third">
+          <span class="donate_cc_month">
+            <select id="form-month" class="can_select required_noname js-required_noname ignore hasCustomSelect" style="appearance: menulist-button; width: 87px; position: absolute; opacity: 0; height: 44px; font-size: 16px;">
+              <option value="">Month *</option>
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="12">12</option>
+            </select><span class="can_select required_noname js-required_noname ignore" style="display: inline-block;"><span class="can_selectInner" style="width: 45px; display: inline-block;">Month *</span></span>
+          </span>
+          <span class="donate_cc_year">
+            <select id="form-year" class="can_select required_noname js-required_noname ignore hasCustomSelect" style="appearance: menulist-button; width: 87px; position: absolute; opacity: 0; height: 44px; font-size: 16px;">
+              <option value="">Year *</option>
+                <option value="2026">2026</option>
+  <option value="2027">2027</option>
+            </select><span class="can_select required_noname js-required_noname ignore" style="display: inline-block;"><span class="can_selectInner" style="width: 45px; display: inline-block;">Year *</span></span>
+          </span>
+        </li>
+        <li class="cc_li_third">
+          <div class="floatlabel-wrapper "><label for="form-card_sec" class="floatlabel-label floatlabel-label-inactive">Security Code *</label><input type="text" size="35" class="required_noname js-required_noname ignore floatlabel-input" id="form-card_sec" placeholder="Security Code *"></div>
+        </li>
+        <input type="hidden" name="new_credit_card" value="true">
+
+          <li class="form_builder_output js-form_builder_output"></li>
+
+
+
+	 <li id="tip_jar">
+          <span id="tip_jar_inner" class="clearfix">
+          <h4 class="nomt">Tip Action Network -- Help Us Keep the Lights On</h4>
+          <span class="tip_jar_desc">This page is hosted by Action Network, a <strong>mission-driven organization</strong> that helps build movements online. Your tip will keep this technology affordable so our movement can continue to win.</span>
+            <span class="tip_jar_fields clearfix">
+              <label class="tip_label tip_label-selected"><input type="radio" checked="" name="donation[tip_amount]" value="10"> 10%</label>
+              <label class="tip_label"><input type="radio" name="donation[tip_amount]" value="20"> 20%</label>
+              <label class="tip_label tip_label_other other_label">
+              <input type="radio" name="donation[tip_amount]" value="other">
+              <input type="text" placeholder="£ Other" id="tip_jar_amount" size="35" value="" name="custom_tip_amount" min="1" class="other_input number"></label>
+              <label class="tip_label"><input type="radio" name="donation[tip_amount]" value="0"> No Tip</label>
+            </span>
+        </span></li>
+
+
+          <li id="donate_form_button-li">
+
+            <input type="hidden" name="source" value="widget">
+            <input type="hidden" name="donation[total_amount]" value="" id="donation_total_amount">
+
+            <input type="submit" id="donate_form_button" class="button button_red js-donate_form_button" value="Securely Contribute Now">
+            <img src="https://actionnetwork.org/images/spinner8.png" class="ajax-loading" alt="Loading">
+          </li>
+        <li id="error_message" class="js-error_message"></li>
+
+        <!--
+  @sharing_card_lists is an intance of SharingCardLists, a presenter inside app/presenters
+  resnponsible for building a list of subscription lists.
+-->
+<li id="d_sharing" class="js-d_sharing">
+  <ul>
+      <li>
+          You may receive email updates from
+          <em>Solidarity Studio,</em>
+          the sponsor of this fundraiser.
+      </li>
+
+    <li><a id="edit_d_sharing_opts" class="js-edit_d_sharing_opts">Edit Subscription Preferences</a><a id="edit_d_sharing_opts-close" class="js-edit_d_sharing_opts-close">Close Preferences</a></li>
+    <li id="d_sharing_opts" class="js-d_sharing_opts">
+      <ul>
+          <li>
+            <label>
+
+                <input type="checkbox" name="subscription[group]" value="375965" id="name_optin1" checked="checked">
+                <input type="hidden" name="subscription[sub_group_id]" value="375965">
+                Opt in to email updates from Solidarity Studio
+
+            </label>
+          </li>
+
+
+
+
+        <input type="hidden" name="subscription[http_referer]" value="localhost">
+        <input id="subscription_source" name="subscription[source]" type="hidden" value="widget">
+        <input id="subscription_action_test" name="subscription[action_test]" type="hidden" value="">
+      </ul>
+    </li>
+  </ul>
+</li>
+
+
+
+<input class="js-tag_list" id="donation_tag_list" name="donation[tag_list]" type="hidden">
+
+
+		</ul>
+		<div class="clear"></div>
+
+</form>	</div>
+	<div id="can_sidebar">
+	            <div class="action_widget action-widget--toggle action_status_tracker">
+
+              <div class="action_status_running_total">£0.00 Amount Raised</div>
+              <div class="action_status_status_bar">
+                <span style="width:0%;">
+                  <span class="action_status_status_bar-grow js-action_status_status_bar-grow" style="width: 100%;"><span class="js-grow-dot grow-dot"><span class="js-grow-dot-flash grow-dot-flash"></span></span></span></span></div>
+              <div class="action_status_goal">
+                Only £50.00 more until our goal of £50.00
+
+              </div>
+            </div>
+
+		<div class=" action_sidebar">
+
+	      <div class="action_description clearfix"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ut vestibulum enim, vitae viverra ipsum. Cras dapibus magna quis metus pulvinar, eget dictum nisi auctor. Tellus. Nullam nec sollicitudin sem.</p><div><br></div> </div>
+	      <div id="action_info">
+  <div id="action_info_inner" class="clearfix flex mb40">
+
+
+
+<div class="action_owner_box single-action_owner_box">
+	<div class="action_owner_title action_sponsor_title"><h5>Sponsored by</h5></div>
+	<div class="action_owner_wrap action_sponsor_wrap">
+		<div class="action_owner clearfix">
+			<a href="https://actionnetwork.org/groups/solidarity-studio" target="_blank">
+				<img alt="Default_group_icon" class="action_author_avatar avatar" src="https://actionnetwork.org/images/default_group_icon.jpg">
+			</a>
+			<div class="action_info_right">
+				<div class="action_info_user js-action_info_user">
+					<a href="https://actionnetwork.org/groups/solidarity-studio" target="_blank">Solidarity Studio</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+  </div>
+</div>
+	    </div>
+	</div>
+</div>
+<div id="logo_wrap">
+	<a href="https://actionnetwork.org" target="_blank">
+		<svg viewBox="0 0 555 173" fill="none" xmlns="http://www.w3.org/2000/svg" width="150" aria-labelledby="anlogoTitle" role="img">
+  <title id="anlogoTitle">Action Network Logo</title>
+  <path d="M36.94 85 6.036 2.038C4.823-1.214 0-.346 0 3.126v165.92c0 3.472 4.823 4.344 6.036 1.088l30.908-82.962A3.1 3.1 0 0 0 36.94 85Z" fill="#FD570D"></path><path d="M74.053 84.994 43.144 2.032c-1.213-3.256-6.036-2.384-6.036 1.088v165.92c0 3.472 4.823 4.344 6.036 1.088l30.909-82.962c.263-.7.263-1.468 0-2.172Z" fill="#CC70EB"></path><path d="M111.165 84.994 80.256 2.032c-1.213-3.256-6.035-2.384-6.035 1.088v165.92c0 3.472 4.822 4.344 6.035 1.088l30.909-82.962c.259-.7.259-1.468 0-2.172Z" fill="#1781FA"></path><path d="M252.213 151.133c.582 0 1.053.467.937 1.054C251.63 163.18 241.108 173 224.27 173c-20.111 0-30.982-13.213-30.982-31.457 0-19.176 11.459-31.807 30.632-31.807 19.757 0 30.749 13.097 31.099 34.143a1.05 1.05 0 0 1-1.054 1.054h-43.023c.7 11.343 5.142 16.369 13.561 16.369 5.846 0 10.056-2.69 11.692-9.12.116-.582.704-1.053 1.286-1.053h14.732v.004Zm-28.176-29.816c-7.016 0-11.225 4.21-12.629 12.51h24.67c-.703-6.43-4.326-12.51-12.041-12.51Zm71.639 48.174c0 .582-.466 1.17-.937 1.403-3.389 1.17-7.249 1.986-10.992 1.986-10.172 0-19.877-5.147-19.877-18.826l.116-30.17h-6.783a1.05 1.05 0 0 1-1.053-1.054v-10.29c0-.583.466-1.053 1.053-1.053h6.783l-.116-14.034a1.05 1.05 0 0 1 1.053-1.054h15.551a1.05 1.05 0 0 1 1.054 1.054l-.117 14.034h13.328a1.05 1.05 0 0 1 1.054 1.053v10.29a1.05 1.05 0 0 1-1.054 1.054h-13.444l.116 29.699c0 5.147 2.573 6.784 6.433 6.784 2.807 0 5.026-.467 6.783-1.054.583-.117 1.053.35 1.053.816v9.362h-.004Zm57.578 1.989c-.583 0-1.17-.466-1.286-1.054l-9.473-44.199-8.186 44.199c-.116.583-.699 1.054-1.286 1.054h-18.475c-.583 0-1.17-.466-1.286-1.054l-12.858-58.112c-.116-.583.35-1.053.821-1.053h15.551c.583 0 1.17.466 1.17 1.053l6.783 44.316 8.302-44.316c.117-.583.7-1.053 1.287-1.053h19.057c.583 0 1.17.466 1.287 1.053l7.952 43.5 7.133-43.5c0-.583.583-1.053 1.17-1.053h14.148c.583 0 .937.466.816 1.053l-12.745 58.117c-.117.583-.699 1.053-1.287 1.053h-18.595v-.004Zm62.438 1.52c-19.64 0-30.982-12.276-30.982-31.457s11.342-31.807 30.982-31.807 30.749 12.276 30.749 31.457c0 19.176-11.105 31.807-30.749 31.807Zm0-11.694c8.652 0 12.745-5.963 12.745-19.759 0-13.563-4.209-20.113-12.862-20.113-8.885.116-12.978 6.667-12.978 20.23s4.326 19.642 13.095 19.642Zm34.62 10.901a1.05 1.05 0 0 1-1.054-1.053l.467-29.117-.467-28.999a1.05 1.05 0 0 1 1.054-1.054h15.435a1.05 1.05 0 0 1 1.053 1.054l-.466 9.119c4.676-7.133 12.745-10.639 21.514-10.639.937 0 1.869.116 2.689.233.583.116 1.054.704 1.054 1.287v10.872c0 .583-.466.937-1.054.937-.699-.116-1.519-.116-2.223-.116-12.395 0-21.63 6.9-21.514 20.696v25.727c0 .583-.466 1.053-1.053 1.053h-15.435Zm77.595-13.357-7.482-13.33-5.729 7.25.116 17.657c0 .583-.466 1.053-1.053 1.053h-15.318a1.05 1.05 0 0 1-1.054-1.053l.466-39.873-.466-39.873a1.05 1.05 0 0 1 1.054-1.053h15.318c.583 0 1.053.466 1.053 1.053l-.349 39.523v3.623l17.421-21.75c.466-.466 1.17-.816 1.752-.816h17.188c.467 0 .583.467.35.816l-18.591 20.813 21.747 37.653c.233.467-.117.937-.583.937h-18.241c-.583 0-1.287-.349-1.52-.937l-6.079-11.693Zm-393.552-23.503v35.08a1.05 1.05 0 0 1-1.054 1.053h-14.614a1.05 1.05 0 0 1-1.054-1.053l.467-39.873-.467-39.873a1.05 1.05 0 0 1 1.054-1.053h19.523c.583 0 1.287.35 1.52.937l32.856 57.533-.704-18.36V90.682a1.05 1.05 0 0 1 1.053-1.054h14.615a1.05 1.05 0 0 1 1.054 1.053l-.467 39.873.467 39.873a1.05 1.05 0 0 1-1.054 1.053h-20.227c-.583 0-1.287-.349-1.52-.937l-32.152-57.412.117 3.156.587 19.06Zm45.908-52.809c-.583 0-1.17-.466-1.403-1.053l-6.312-19.76h-30.632l-6.079 19.76c-.233.583-.821 1.053-1.404 1.053h-16.017c-.583 0-.937-.466-.7-1.053l27.705-79.75c.234-.583.821-1.053 1.404-1.053h21.863c.583 0 1.17.466 1.403 1.053l27.127 79.75c.233.583-.117 1.053-.7 1.053h-16.255Zm-12.158-34.963L156.88 12.612l-10.638 34.963h21.863Zm57.409 36.481c-19.291 0-30.749-12.276-30.749-31.456 0-19.181 11.458-31.807 31.098-31.807 15.435 0 25.486 8.77 26.889 21.866.117.583-.349 1.054-.937 1.054h-14.148c-.583 0-1.053-.466-1.17-1.054-1.403-6.783-5.613-10.056-10.638-10.056-8.885.116-13.095 6.55-13.095 19.88 0 13.8 4.326 19.764 13.095 19.88 5.962.117 10.405-4.093 11.109-11.926.116-.583.583-1.054 1.17-1.054h14.498c.583 0 1.053.466.937 1.054-1.287 13.68-12.275 23.62-28.059 23.62Zm67.696-3.743c0 .583-.466 1.17-.937 1.404-3.389 1.17-7.249 1.986-10.992 1.986-10.172 0-19.877-5.147-19.877-18.827l.116-30.17h-6.782a1.05 1.05 0 0 1-1.054-1.053V23.367a1.05 1.05 0 0 1 1.054-1.053h6.782l-.116-14.034a1.05 1.05 0 0 1 1.053-1.053h15.552a1.05 1.05 0 0 1 1.053 1.053l-.117 14.034h13.328a1.05 1.05 0 0 1 1.054 1.053v10.29a1.05 1.05 0 0 1-1.054 1.054h-13.444l.116 29.7c0 5.146 2.574 6.783 6.433 6.783 2.807 0 5.026-.467 6.783-1.054.583-.116 1.054.35 1.054.816v9.357h-.005Zm5.263-63.845a1.049 1.049 0 0 1-1.053-1.049V1.735a1.05 1.05 0 0 1 1.053-1.053h15.668a1.05 1.05 0 0 1 1.054 1.053V15.42c0 .583-.466 1.05-1.054 1.05h-15.668Zm0 66.07a1.05 1.05 0 0 1-1.053-1.053l.35-29-.35-29.116a1.05 1.05 0 0 1 1.053-1.054h15.785c.583 0 1.053.466 1.053 1.053l-.349 29.117.349 29a1.05 1.05 0 0 1-1.053 1.053h-15.785Zm52.264 1.518c-19.64 0-30.982-12.276-30.982-31.456 0-19.181 11.342-31.807 30.982-31.807s30.753 12.28 30.753 31.457c0 19.176-11.109 31.806-30.753 31.806Zm0-11.693c8.652 0 12.745-5.963 12.745-19.76 0-13.562-4.21-20.113-12.862-20.113-8.885.117-12.978 6.667-12.978 20.23s4.326 19.643 13.095 19.643Zm36.132 10.173a1.05 1.05 0 0 1-1.054-1.054l.35-27.83-.116-30.286a1.05 1.05 0 0 1 1.053-1.053h14.852a1.05 1.05 0 0 1 1.054 1.053l-.35 6.546c4.093-5.26 10.992-9.003 19.407-9.003 12.745 0 20.931 8.654 20.931 23.387v12.626l.349 24.556a1.05 1.05 0 0 1-1.053 1.054h-15.668a1.05 1.05 0 0 1-1.054-1.054l.234-24.556V44.529c0-6.55-3.86-10.756-9.119-10.756-6.312 0-13.095 5.846-13.095 18.71v4.443l.234 24.556a1.05 1.05 0 0 1-1.054 1.054h-15.901Z" fill="#000" class="text"></path></svg>
+	</a>
+</div>
+</div>
+
+</body>
