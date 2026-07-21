@@ -672,19 +672,37 @@ function extractFontFamilyName(v){
 }
 /* Combines whichever CURRENT --font-heading/--font-body tokens are
    recognised curated fonts into one Google Fonts css2 URL (deduped if
-   they're the same family). Always requests 400+700 - covers plain text
-   and <strong>/<b> emphasis without needing to track --heading-weight. */
+   they're the same family). Both always get 400+700 (plain text plus
+   <strong>/<b> emphasis); the heading font ALSO gets whichever exact
+   weight --heading-weight is currently set to - without that, picking
+   e.g. 900 correctly changes the CSS but the browser has no 900-weight
+   glyphs to actually render, since only 400/700 were ever fetched. */
 function buildGoogleFontsUrl(){
-  var families = {};
-  ["font-heading","font-body"].forEach(function(key){
-    var tok = tokenByKey(key);
-    if(!tok) return;
-    var known = findGoogleFont(extractFontFamilyName(tok.value));
-    if(known) families[known[0]] = true;
-  });
-  var names = Object.keys(families);
+  var weightsByName = {};
+  function addWeight(name, w){
+    if(!weightsByName[name]) weightsByName[name] = {};
+    weightsByName[name][w] = true;
+  }
+  var headingTok = tokenByKey("font-heading"), bodyTok = tokenByKey("font-body");
+  var headingWeightTok = tokenByKey("heading-weight");
+  if(headingTok){
+    var hName = extractFontFamilyName(headingTok.value);
+    if(findGoogleFont(hName)){
+      addWeight(hName, 400); addWeight(hName, 700);
+      var hw = parseInt((headingWeightTok||{}).value, 10);
+      if(hw) addWeight(hName, hw);
+    }
+  }
+  if(bodyTok){
+    var bName = extractFontFamilyName(bodyTok.value);
+    if(findGoogleFont(bName)){ addWeight(bName, 400); addWeight(bName, 700); }
+  }
+  var names = Object.keys(weightsByName);
   if(!names.length) return "";
-  var parts = names.map(function(n){ return "family="+encodeURIComponent(n).replace(/%20/g,"+")+":wght@400;700"; });
+  var parts = names.map(function(n){
+    var weights = Object.keys(weightsByName[n]).map(Number).sort(function(a,b){return a-b;});
+    return "family="+encodeURIComponent(n).replace(/%20/g,"+")+":wght@"+weights.join(";");
+  });
   return "https://fonts.googleapis.com/css2?"+parts.join("&")+"&display=swap";
 }
 /* Whether the Fonts tab should default to showing the advanced/custom
@@ -1171,6 +1189,12 @@ function onFormInput(e){
       setToken(el.dataset.token, (parseFloat(el.value)||0)+"px");
     } else {
       setToken(el.dataset.token, el.value);
+      /* Heading boldness changed - the Google Fonts URL needs to actually
+         request this weight's font file, or the CSS changes but there are
+         no glyphs at that weight to render (see buildGoogleFontsUrl()). */
+      if(el.dataset.token==="heading-weight" && !fontAdvancedMode){
+        CONFIG.fontUrl = buildGoogleFontsUrl();
+      }
       /* sync color picker (+ alpha slider, for coloralpha tokens) <-> text */
       if(el.type==="text"){
         var picker=document.querySelector('[data-color-for="'+el.dataset.token+'"]');
