@@ -307,6 +307,16 @@
     padding-bottom: 0 !important;
     color: var(--accent);
   }
+  /* On the thank-you page, AN's whitelabel CSS centers the surrounding
+     #can_thank_you content, but its own .entry-title base style stays
+     left-aligned (correct for its usual spot above a two-column form) -
+     the two fight. Re-center just here so the branded title (still using
+     .entry-title for the accent-colour/size treatment above) doesn't sit
+     oddly left-aligned above centered thank-you copy. */
+  .an-homepage-embed #can_embed_form.can_thank_you_wrap h2.entry-title,
+  .an-homepage-embed #can_embed_form.can_thank_you_wrap h1.entry-title {
+    text-align: center;
+  }
   .an-homepage-embed #can_embed_form .main_action_image { margin-bottom: 16px !important; }
 
   /* 7. HIDE "SPONSORED BY" / "PETITION BY" [MODULE - on by default via the

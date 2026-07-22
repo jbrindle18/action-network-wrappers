@@ -116,6 +116,30 @@ it:
 This has no effect on Copy Header/Footer/Save/Import — those never touch the
 preview fixtures.
 
+### Thank-you page preview
+
+The Form/Thank-you toggle switches between the pre- and post-submission
+fixtures (`previews/petition-thankyou.html` for now — only petition has one).
+Unlike the form fixtures, this one is **hand-built**, not captured: getting
+the real post-signature DOM means actually completing a signature, and doing
+that from an automated browser tripped Action Network's own anti-bot
+challenge script (a real network error, not a workaround-able block — don't
+try to defeat it). The fixture is built instead from the `.can_thank_you_wrap`
+/ `#can_thank_you` / `.can_thank_you-block` / `#referral_code_select_wrap`
+classes `wrapper.html`'s own CSS already documents, reusing the
+already-verified sponsor-box and logo markup from `petition.html`. If you
+ever get a real capture (e.g. by manually signing a real test action from an
+ordinary browser and saving the page), replace it the same way.
+
+Because `shareButtons`/`shareLabel`/`sharePlatforms` only ever render on this
+page, `generator.html`'s `patchLiveModuleConfig()` patches a copy of the
+preview's header text with the live form values (reusing `buildWrapper()`'s
+own substitution patterns) before composing the iframe — otherwise
+`window.ANW` would always reflect whatever `wrapper.html` hardcodes as its
+default, never what's actually in the form. This takes effect when the
+preview reloads (switching type/view, or the refresh button), not per
+keystroke.
+
 ## Editing `wrapper.html` by hand (advanced)
 
 Everything tweakable is searchable by the keyword **`CONFIG`**.
