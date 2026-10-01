@@ -160,19 +160,7 @@ this file the same way (see README.md).
 
 
 
-	 <li id="tip_jar">
-          <span id="tip_jar_inner" class="clearfix">
-          <h4 class="nomt">Tip Action Network -- Help Us Keep the Lights On</h4>
-          <span class="tip_jar_desc">This page is hosted by Action Network, a <strong>mission-driven organization</strong> that helps build movements online. Your tip will keep this technology affordable so our movement can continue to win.</span>
-            <span class="tip_jar_fields clearfix">
-              <label class="tip_label tip_label-selected"><input type="radio" checked="" name="donation[tip_amount]" value="10"> 10%</label>
-              <label class="tip_label"><input type="radio" name="donation[tip_amount]" value="20"> 20%</label>
-              <label class="tip_label tip_label_other other_label">
-              <input type="radio" name="donation[tip_amount]" value="other">
-              <input type="text" placeholder="£ Other" id="tip_jar_amount" size="35" value="" name="custom_tip_amount" min="1" class="other_input number"></label>
-              <label class="tip_label"><input type="radio" name="donation[tip_amount]" value="0"> No Tip</label>
-            </span>
-        </span></li>
+	 <!-- AN's "Tip Action Network" tip jar removed from this preview on purpose. -->
 
 
           <li id="donate_form_button-li">
@@ -189,35 +177,25 @@ this file the same way (see README.md).
   @sharing_card_lists is an intance of SharingCardLists, a presenter inside app/presenters
   resnponsible for building a list of subscription lists.
 -->
-<li id="d_sharing" class="js-d_sharing">
-  <ul>
-      <li>
-          You may receive email updates from
-          <em>Solidarity Studio,</em>
-          the sponsor of this fundraiser.
-      </li>
-
-    <li><a id="edit_d_sharing_opts" class="js-edit_d_sharing_opts">Edit Subscription Preferences</a><a id="edit_d_sharing_opts-close" class="js-edit_d_sharing_opts-close">Close Preferences</a></li>
-    <li id="d_sharing_opts" class="js-d_sharing_opts">
-      <ul>
-          <li>
-            <label>
-
-                <input type="checkbox" name="subscription[group]" value="375965" id="name_optin1" checked="checked">
-                <input type="hidden" name="subscription[sub_group_id]" value="375965">
-                Opt in to email updates from Solidarity Studio
-
-            </label>
-          </li>
-
-
-
-
-        <input type="hidden" name="subscription[http_referer]" value="localhost">
-        <input id="subscription_source" name="subscription[source]" type="hidden" value="widget">
-        <input id="subscription_action_test" name="subscription[action_test]" type="hidden" value="">
-      </ul>
+<li id="d_sharing" class="js-d_sharing affirmative_optin_d_sharing">
+  <ul class="nomb">
+    <li class="control-group js-affirmative_optin_control_group nomt">
+      <label class="control-label check_radio_label noml nomt nomb">If you are not already subscribed, would you like to receive email updates from Solidarity Studio ? *</label>
+      <span class="controls check_radio_field">
+        <label class="radio noml nomb mt5">
+          <input type="radio" name="subscription[group]" value="375965" class="js-affirmative_optin_radio"> Yes, opt in to email updates
+        </label>
+        <label class="radio noml nomt">
+          <input type="radio" name="subscription[group]" value="invalid" class="js-affirmative_optin_radio js-affirmative_optin_radio_no"> No, do not opt in
+        </label>
+      </span>
+      <input type="hidden" name="subscription[sub_group_id]" value="375965">
     </li>
+    <div class="affirmative_note">
+      <small><em>Note: If you subscribed earlier, this will not unsubscribe you. You can unsubscribe using the link provided in emails you receive. You can always take action without opting in.</em></small>
+    </div>
+    <input type="hidden" name="subscription[http_referer]" value="">
+    <input id="subscription_source" name="subscription[source]" type="hidden" value="">
   </ul>
 </li>
 

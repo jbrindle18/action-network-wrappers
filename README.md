@@ -49,11 +49,14 @@ is UTF-8-safe (handles £, em-dashes, etc.).
 
 ## Using the tool (the normal, no-code workflow)
 
-1. Open the tool. Work through the sections — colours, fonts, logo, layout,
-   footer, share options.
+1. Open the tool. Work through the sections — logo, colours, fonts, layout,
+   footer, then the thank-you **Daisy chain**.
 2. **Copy Header** → paste into the **Header** box of your AN page wrapper.
    **Copy Footer** → paste into the **Footer** box.
-   (In AN: Start Organizing → your group → Page wrappers → new/edit wrapper.)
+   (In AN: Details → Page Wrappers → Add New Wrapper.)
+   What's copied is the wrapper minus its explanatory comments (about half the
+   size), plus a one-line note pointing back to the tool. **Save Wrapper** keeps
+   the fully-commented file.
 3. Save in AN; set your action to use that wrapper.
 4. **Save Wrapper** keeps a `wrapper.html` file. Next time, **Import Saved
    Wrapper** reads its settings (colours, fonts, logo, layout, modules, share,
@@ -207,24 +210,85 @@ Toggles live in the `window.ANW` block (CONFIG: MODULES):
 window.ANW = {
   recurringPretick: false,        // pre-tick "Make This Recurring Monthly"
   hideFundraiserSidebar: false,   // hide the donation iframe's right sidebar
-  shareButtons: true,             // share buttons on the thank-you page
-  shareLabel: "Share this with your network",
+  jumpToAction: true,             // floating "jump to the form" button, mobile only
+  jumpToActionLabel: "Take action",
   fontUrl: "https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&display=swap"
 };
 ```
 
+- **Shared helpers** — `ANW.type()` returns the action type (petition, letter,
+  form, event, fundraiser) from the AN address (`/petitions/…`, `/letters/…`,
+  `/forms/…`, `/events/…`, `/fundraising/…` — checked live for petitions,
+  events and fundraisers), falling back to the widget's `can-<type>-area-…`
+  mount div. It's also added to `<body>` as `anw-type-<type>`, a hook for
+  type-specific CSS. `ANW.watch(fn)` is the page's single MutationObserver,
+  which every module below shares.
 - **Loader fade** *(always on)* — fades out the loading skeleton once AN's form
   or donation iframe has rendered.
-- **Fundraiser iframe injection** *(always on)* — the donation widget renders in
-  a same-origin iframe whose document AN replaces after its widget JS loads. This
-  module copies the inline CSS + font `<link>` into that iframe and tags its
-  `<body>` so the brand styles apply inside it too. It re-injects on `load`, on a
-  ~30s poll, and via a MutationObserver; the sweep is idempotent.
+- **Fundraiser iframe injection** *(fundraisers + events only)* — the donation
+  widget renders in a same-origin iframe whose document AN replaces after its
+  widget JS loads. This module copies the inline CSS + font `<link>` into that
+  iframe and tags its `<body>` so the brand styles apply inside it too. It
+  re-injects on `load`, on a ~30s poll, and via the shared watcher; the sweep
+  is idempotent. Skipped entirely on petitions, letters and forms.
+- **Stack the description sidebar** *(toggle, fundraisers, ships OFF)* — one
+  column of amount raised, title, description, then the donation form. Pure
+  CSS: `display:contents` dissolves AN's two column boxes (`#can_main_col`,
+  `#can_sidebar`) so `order` can interleave their children. "Hide the
+  description sidebar" wins if both are on.
+- **Fundraiser width** — with the sidebar stacked or hidden, fundraiser pages
+  use `--fundraiser-max` (default 850px) instead of `--wrapper-max` for the
+  content area. In the tool it appears under those two options only while one
+  is ticked.
+- **Donation amounts** *(always on, fundraisers)* — the suggested amounts take
+  the submit button's colours, radius and capitalisation; the selected one
+  (`.donate_amount-selected`) is inverted. A typed "Other" amount shows the
+  group's currency symbol in front (read from AN's "£ Other" placeholder).
+  Pre-tick recurring also sets the frequency to Monthly.
+- **Donation form fields** *(always on, fundraisers)* — AN's floated
+  half / quarter / third field widths are replaced by a 12-column grid with
+  even 12px gaps (name | name, email | address, city | country | postcode,
+  card | expiry | security code). Its breakpoints are container queries on
+  `#donate_form`, so they follow the form's own width — narrow in the
+  side-by-side layout even on desktop.
+- **Tick boxes + radios** *(always on, every action type)* — drawn in the
+  theme instead of the browser's 13px defaults: a 20px square / circle in
+  `--input-border` that fills with `--accent` (tick or dot in `--input-bg`),
+  plus a keyboard focus ring. The radios AN hides behind its own buttons
+  (donation amounts, tip jar) are left alone. AN's `#can_embed_form
+  #d_sharing input` rule (two ids) forces opt-in radios to `width:auto` and
+  its own position, hence the few `!important`s. The preview fixtures carry
+  the live "affirmative opt-in" Yes / No question (captured from a real
+  fundraiser) in place of the old "Edit Subscription Preferences" block.
+- **Hide "Contributions will go to"** *(toggle, fundraisers, ships OFF)* —
+  hides `#donation_recipient_wrap`, the line naming who receives the donation.
 - **Recurring pre-tick** *(toggle)* — pre-ticks "Make This Recurring Monthly".
   ⚠️ May be disallowed by some orgs / payment processors — ships OFF.
-- **Share buttons** *(toggle, default ON)* — appends share buttons to the
-  thank-you page (`#can_thank_you`), watched via MutationObserver. Shares the AN
-  action URL. Fundraiser thank-yous live in AN's own iframe and aren't covered.
+- **Daisy chain** *(default OFF)* — replaces the old share-buttons module. What
+  people see on the thank-you page (`#can_thank_you`): one or more pages of
+  rich text, buttons, button groups and social-share rows, where a button can
+  open another page, a link, a share intent or copy the link. **Petitions,
+  letters and forms only**: events keep AN's default thank-you page by choice,
+  and fundraisers move on to a separate thank-you page the wrapper can't reach,
+  so the module skips both (via `ANW.type()`). Which page opens first can
+  differ between petitions, letters and forms. Saved as plain JSON in
+  `window.ANW_CHAIN` between `/* daisy-chain:start */` and
+  `/* daisy-chain:end */` (CONFIG: DAISY CHAIN), which is how Import Saved
+  Wrapper reads it back; a wrapper saved before the chain existed has its
+  share-button settings converted into an equivalent one-page chain. Its CSS
+  sits between `daisy-chain-css:start/end` markers, which the tool's builder
+  reads to draw its page editor with the real styles.
+  In the tool, the **Daisy chain** tab swaps the preview for a flow canvas (a
+  start card for action types, one card per page, wires from buttons to the
+  pages they open — drag from a button's dot to connect, or drop on empty space
+  to create a page). The left column shows the chain's settings, or — once a
+  page card is clicked — that page's editor/preview.
+- **Jump to action** *(toggle, default ON)* — on mobile (below 768px), where the
+  form stacks under the description, floats a button at the bottom of the screen
+  that scrolls to the form (`#can_sidebar`). Not used on fundraisers. It hides
+  once the form is reached and stays hidden on the thank-you page. Uses the
+  button colours; text is `jumpToActionLabel`. (In the tool: Layout & options →
+  Mobile.)
 
 ### Layout
 Pick a class on `.gen_wrapper` (CONFIG: LAYOUT):
@@ -250,8 +314,8 @@ Pick a class on `.gen_wrapper` (CONFIG: LAYOUT):
 root). To update: edit, **re-bake if `wrapper.html` changed**, commit, push.
 Pages rebuilds in ~1–2 min. The Webflow page frames it via `webflow-embed.html`;
 the iframe auto-grows to the tool's height via `postMessage`. The section
-sidebar shows in the embed when the container is ≥ 860px wide and folds away
-below that.
+sidebar shows in the embed when the container is ≥ 860px wide; below that a
+section dropdown replaces it.
 
 ## Notes / gotchas
 

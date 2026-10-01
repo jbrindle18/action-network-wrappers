@@ -18,8 +18,8 @@
 
        -----------------------------------------------------------------------
        HOW IT'S INSTALLED IN ACTION NETWORK
-       Paste this whole file into an AN page-wrapper template (Start Organizing →
-       your group → Page wrappers). AN injects the action widget at the
+       Paste this whole file into an AN page-wrapper template (Details → Page
+       Wrappers → Add New Wrapper). AN injects the action widget at the
        END-TEMPLATE-HEADER / START-WIDGET marker further down this file, so
        everything before it goes in the Header field and everything after in the
        Footer field - the tool's Copy Header / Copy Footer buttons split it for
@@ -36,11 +36,13 @@
          2. CONFIG: LOGO          - set the logo <img> src + alt + home link.
          3. CONFIG: MODULES       - toggle optional behaviours (window.ANW).
          4. CONFIG: LAYOUT        - pick the .gen_wrapper layout-- class.
+         5. CONFIG: DAISY CHAIN   - the thank-you page's text, buttons and
+                                    routing (far easier to build in the tool).
        Note: if you edit this file by hand, the hosted tool won't reflect your
        change until its baked-in copy is refreshed (see README → "Re-baking").
        ======================================================================= -->
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
   <!-- CONFIG: LOGO - favicon (optional) -->
@@ -93,6 +95,7 @@
     --input-radius:     0;
     --input-height:     50px;
     --wrapper-max:      1200px;
+    --fundraiser-max:   850px;     /* fundraisers only, when the sidebar is stacked or hidden */
 
     /* LOGO sizing */
     --logo-max-height:  40px;
@@ -205,6 +208,14 @@
     box-sizing: border-box;
   }
 
+  /* 3b. FUNDRAISER WIDTH - with the description sidebar stacked or hidden
+     the donation form is one column, so fundraisers use --fundraiser-max
+     instead of --wrapper-max. Content area only - the header keeps the
+     normal width. Body classes come from the shared helpers script. */
+  .an-homepage-embed.anw-type-fundraiser.anw-fundraiser-narrow .gen_wrapper[class*="layout--"] {
+    width: var(--fundraiser-max);
+  }
+
   /* 4. COLUMNS - description plain, form on a white card */
   .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_main_col,
   .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_main_col {
@@ -247,6 +258,30 @@
      Needs the iframe injector: it adds .an-hide-sidebar to the iframe <body>. */
   .an-homepage-embed.can_fundraising_widget.an-hide-sidebar #can_sidebar { display: none !important; }
   .an-homepage-embed.can_fundraising_widget.an-hide-sidebar #can_main_col { width: 100% !important; }
+
+  /* 4b2. FUNDRAISER sidebar-stack [MODULE - enable via ANW.stackFundraiserSidebar].
+     AN splits the donation widget into two columns: #can_main_col (title +
+     form) and #can_sidebar (amount raised + description). display:contents
+     dissolves both column boxes, so their children become items of one
+     flex column that `order` can interleave: amount raised, title,
+     description, form. Anything else in either column keeps its place at
+     the end. Needs the iframe injector: it adds .an-stack-sidebar. */
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_embed_form > .clearfix {
+    display: flex !important; flex-direction: column !important; flex-wrap: nowrap !important; gap: 0 !important;
+  }
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_main_col,
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_sidebar { display: contents !important; }
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_main_col > *,
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_sidebar > * { order: 5; }
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_sidebar > .action_status_tracker { order: 1; margin-bottom: 24px; width: 100% !important; }
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_main_col > .entry-title { order: 2; }
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_sidebar > .action_sidebar { order: 3; margin-bottom: 24px; width: 100% !important; }
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar #can_main_col > form { order: 4; }
+  /* 4b3. FUNDRAISER "Contributions will go to" [MODULE - ANW.hideDonationRecipient].
+     Needs the iframe injector: it adds .an-hide-recipient. */
+  .an-homepage-embed.can_fundraising_widget.an-hide-recipient #donation_recipient_wrap { display: none !important; }
+  /* Hide wins if both are on (this beats the display:contents above). */
+  .an-homepage-embed.can_fundraising_widget.an-stack-sidebar.an-hide-sidebar #can_sidebar { display: none !important; }
 
   /* 4c. IFRAME CONTEXT - inset the form inside the donation / event widget.
      No outer card there (iframe <body> has .an-homepage-embed but NOT .gen_body),
@@ -420,6 +455,138 @@
   .an-homepage-embed #can_embed_form .button:hover,
   .an-homepage-embed #donate_auto_modal input[type="submit"]:hover,
   .an-homepage-embed #donate_auto_modal .button:hover { background-color: var(--button-bg-hover); color: var(--button-text); }
+
+  /* 9b. DONATION AMOUNTS (fundraisers) - the suggested amounts look like the
+     submit button; the selected one (AN adds .donate_amount-selected) is the
+     inverse. Beats AN's own green hover/selected rule on specificity. */
+  .an-homepage-embed #can_embed_form label.donate_amount {
+    background-color: var(--button-bg); color: var(--button-text);
+    border: 2px solid var(--button-bg); border-radius: var(--button-radius);
+    font-weight: 700; text-transform: var(--button-transform);
+    /* AN centres the text with a 56px line-height on a 56px box; our 2px
+       border eats 4px of that, which sat the text 2px low. */
+    height: 56px; line-height: 52px; box-sizing: border-box;
+  }
+  .an-homepage-embed #can_embed_form label.donate_amount:hover {
+    background-color: var(--button-bg-hover); border-color: var(--button-bg-hover); color: var(--button-text);
+  }
+  .an-homepage-embed #can_embed_form label.donate_amount-selected,
+  .an-homepage-embed #can_embed_form label.donate_amount-selected:hover {
+    background-color: var(--button-text); color: var(--button-bg); border-color: var(--button-bg);
+  }
+  /* "Other" amount: show the currency symbol in front of a typed number. The
+     iframe injector copies the symbol from AN's own "£ Other" placeholder onto
+     the label, so it follows the group's currency. */
+  .an-homepage-embed #can_embed_form label.other_label[data-anw-currency] { position: relative; }
+  .an-homepage-embed #can_embed_form label.other_label[data-anw-currency]:has(.other_input:not(:placeholder-shown))::after {
+    content: attr(data-anw-currency);
+    position: absolute; top: 50%; left: var(--anw-currency-left, 14px); transform: translateY(-50%);
+    color: var(--body); font-weight: 400; font-size: 16px; pointer-events: none;
+  }
+  .an-homepage-embed #can_embed_form label.other_label[data-anw-currency] .other_input:not(:placeholder-shown) {
+    padding-left: calc(var(--anw-currency-pad, 13px) + 1em) !important;
+  }
+
+  /* 9c. DONATION FORM FIELDS (fundraisers) - AN floats these at half /
+     quarter / third widths, which wraps unevenly and leaves ragged gaps. A
+     12-column grid gives clean rows with even spacing:
+       first name | last name,  email | address,
+       city | country | postcode,  card number | expiry | security code.
+     Anything else (button, errors, opt-ins) spans the full width; on narrow
+     screens the halves and thirds stack. AN's styled dropdowns are a hidden
+     native <select> laid over a <span class="can_select"> with inline pixel
+     widths - both are stretched to fill their cell. */
+  .an-homepage-embed #can_embed_form #donate_form > ul {
+    display: grid !important; grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 12px; row-gap: 0; margin: 0 !important; padding: 0 !important; list-style: none;
+  }
+  .an-homepage-embed #can_embed_form #donate_form > ul::before,
+  .an-homepage-embed #can_embed_form #donate_form > ul::after { display: none !important; }   /* clearfix pseudos would become grid cells */
+  /* Every child, not just <li>: on live pages AN also puts divs in this
+     list (#donate_login, .additional_text, scripts) - left unplaced they
+     each squeeze into one 1/12 column. */
+  .an-homepage-embed #can_embed_form #donate_form > ul > * {
+    grid-column: 1 / -1; float: none !important; clear: none !important;
+    width: auto !important; min-width: 0; margin: 0 0 12px !important; padding: 0 !important;
+  }
+  .an-homepage-embed #can_embed_form #donate_form > ul > li:not(:has(*)) { margin: 0 !important; }
+  .an-homepage-embed #can_embed_form #donate_form > ul > #donate_login { font-size: 14px; }   /* empty placeholders */
+  .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_half    { grid-column: span 6; }
+  .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_quarter { grid-column: span 3; }
+  .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_third   { grid-column: span 4; }
+  .an-homepage-embed #can_embed_form #donate_form > ul > li:has(.donate_cc_month) { display: flex; gap: 12px; }
+  .an-homepage-embed #can_embed_form #donate_form > ul .donate_cc_month,
+  .an-homepage-embed #can_embed_form #donate_form > ul .donate_cc_year { position: relative; flex: 1 1 0; min-width: 0; }
+  .an-homepage-embed #can_embed_form #donate_form > ul .floatlabel-wrapper,
+  .an-homepage-embed #can_embed_form #donate_form > ul input[type="text"],
+  .an-homepage-embed #can_embed_form #donate_form > ul input[type="email"],
+  .an-homepage-embed #can_embed_form #donate_form > ul input[type="tel"] { width: 100% !important; margin-bottom: 0 !important; }   /* the grid does the spacing */
+  .an-homepage-embed #can_embed_form #donate_form > ul select.hasCustomSelect { width: 100% !important; left: 0; margin-bottom: 0 !important; }
+  .an-homepage-embed #can_embed_form #donate_form > ul span.can_select { display: block !important; width: 100% !important; margin-bottom: 0 !important; }
+  .an-homepage-embed #can_embed_form #donate_form > ul span.can_selectInner { width: auto !important; }
+  /* Breakpoints follow the FORM's width, not the screen's (container
+     queries): in the side-by-side layout the form column is narrow even on
+     a desktop. Medium: city full width, country | postcode, card full width,
+     expiry | security code. Narrow: one field per row (country | postcode
+     and the expiry pair stay paired). */
+  .an-homepage-embed #can_embed_form #donate_form { container-type: inline-size; }
+  @container (max-width: 560px) {
+    .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_half.clear,
+    .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_third.clear { grid-column: 1 / -1; }
+    .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_quarter,
+    .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_third { grid-column: span 6; }
+  }
+  @container (max-width: 380px) {
+    .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_half,
+    .an-homepage-embed #can_embed_form #donate_form > ul > li.cc_li_third { grid-column: 1 / -1; }
+  }
+
+  /* 9d. TICK BOXES + RADIOS - the browser's default 13px controls ignore the
+     theme, so they're drawn here: a square (checkbox) or circle (radio) in
+     the input-border colour that fills with --accent when chosen - a tick
+     or a dot in the input background colour - plus a focus ring for
+     keyboard users. The radios AN keeps invisible behind its own buttons
+     (donation amounts, tip jar) are left alone. Option labels (opt-in
+     Yes / No) get room for the larger control, aligned to the first line. */
+  .an-homepage-embed #can_embed_form input[type="checkbox"]:not(label.donate_amount *):not(label.tip_label *),
+  .an-homepage-embed #can_embed_form input[type="radio"]:not(label.donate_amount *):not(label.tip_label *) {
+    -webkit-appearance: none; appearance: none; box-sizing: border-box;
+    /* !important: AN's "#can_embed_form #d_sharing input" (two ids) sets
+       width / height auto and display inline-block on the opt-in radios. */
+    width: 20px !important; height: 20px !important; margin: 0 8px 0 0; padding: 0; flex: 0 0 auto;
+    display: inline-grid !important; place-content: center; vertical-align: -4px; cursor: pointer;
+    border: 2px solid var(--input-border); border-radius: 3px; background-color: var(--input-bg);
+    transition: background-color .15s ease, border-color .15s ease;
+  }
+  .an-homepage-embed #can_embed_form input[type="radio"]:not(label.donate_amount *):not(label.tip_label *) { border-radius: 50%; }
+  .an-homepage-embed #can_embed_form input[type="checkbox"]:not(label.donate_amount *):not(label.tip_label *)::before,
+  .an-homepage-embed #can_embed_form input[type="radio"]:not(label.donate_amount *):not(label.tip_label *)::before {
+    content: ""; transform: scale(0); transition: transform .12s ease;
+  }
+  .an-homepage-embed #can_embed_form input[type="checkbox"]:not(label.donate_amount *):not(label.tip_label *)::before {
+    width: 12px; height: 12px; background: var(--input-bg);
+    clip-path: polygon(14% 52%, 0 66%, 38% 100%, 100% 22%, 86% 8%, 38% 72%);   /* tick */
+  }
+  .an-homepage-embed #can_embed_form input[type="radio"]:not(label.donate_amount *):not(label.tip_label *)::before {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  }
+  .an-homepage-embed #can_embed_form input[type="checkbox"]:not(label.donate_amount *):not(label.tip_label *):checked {
+    background-color: var(--accent); border-color: var(--accent);
+  }
+  .an-homepage-embed #can_embed_form input[type="radio"]:not(label.donate_amount *):not(label.tip_label *):checked { border-color: var(--accent); }
+  .an-homepage-embed #can_embed_form input[type="checkbox"]:not(label.donate_amount *):not(label.tip_label *):checked::before,
+  .an-homepage-embed #can_embed_form input[type="radio"]:not(label.donate_amount *):not(label.tip_label *):checked::before { transform: scale(1); }
+  .an-homepage-embed #can_embed_form input[type="checkbox"]:focus-visible,
+  .an-homepage-embed #can_embed_form input[type="radio"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  /* AN positions option inputs absolutely at the label's top-left, with a
+     25px text indent sized for its 13px control. */
+  .an-homepage-embed #can_embed_form .check_radio_field label:not(.donate_amount):not(.tip_label) {   /* not the amount buttons - same wrapper class */
+    padding-top: 0 !important; padding-left: 32px !important;
+  }
+  .an-homepage-embed #can_embed_form .check_radio_field label > input[type="radio"]:not(label.donate_amount *),
+  .an-homepage-embed #can_embed_form .check_radio_field label > input[type="checkbox"] {
+    position: absolute !important; left: 0 !important; top: 2px !important; margin: 0;   /* beats the same #d_sharing rule */
+  }
 
   /* 10. LINKS */
   .an-homepage-embed a { color: var(--accent); text-decoration: underline; }
@@ -619,30 +786,87 @@
     .an-homepage-embed .can_embed #can_embed_form > .clearfix #can_sidebar { padding: 20px !important; }
   }
 
-  /* SHARE BUTTONS - injected into the thank-you page by the module below. */
-  .an-homepage-embed .anw-share { margin-top: 28px; text-align: center; }
-  .an-homepage-embed .anw-share__label {
-    margin: 0 0 12px; font-size: 15px;
-    font-family: var(--font-heading, inherit);
-    font-weight: var(--heading-weight, 700); color: var(--heading, inherit);
+  /* 19. MOBILE "JUMP TO ACTION" BUTTON [MODULE - ANW.jumpToAction]. Floats at
+     the bottom of the screen while the user scrolls through the intro content
+     on mobile, where the description and the form stack vertically. Hidden
+     once the form scrolls into view - see the module script below, which
+     toggles the .is-visible class. Mobile-only by design: display stays none
+     outside the media query, so there's no desktop override to maintain. */
+  .an-homepage-embed .anw-jump {
+    position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40;
+    display: none; align-items: center; justify-content: center; gap: 8px;
+    transform: translateY(8px);
+    background-color: var(--button-bg); color: var(--button-text); border: none;
+    border-radius: var(--button-radius); padding: 14px 20px;
+    font-family: var(--font-body); font-size: 15px; font-weight: 700;
+    text-transform: var(--button-transform); letter-spacing: .4px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,.35);
+    cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
   }
-  .an-homepage-embed .share-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-  .an-homepage-embed .share-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 22px; border-radius: var(--button-radius); border: none; color: #fff;
-    font-size: 14px; font-weight: 500; font-family: inherit;
-    cursor: pointer; text-decoration: none;
-    transition: opacity .2s ease, transform .1s ease;
+  .an-homepage-embed .anw-jump:hover { background-color: var(--button-bg-hover); color: var(--button-text); }
+  .an-homepage-embed .anw-jump svg { flex: 0 0 auto; }
+  @media (max-width: 767px) {
+    .an-homepage-embed .anw-jump { display: inline-flex; }
+    .an-homepage-embed .anw-jump.is-visible {
+      opacity: 1; pointer-events: auto; transform: translateY(0);
+    }
   }
-  .an-homepage-embed .share-btn:hover  { opacity: .85; color: #fff; text-decoration: none; }
-  .an-homepage-embed .share-btn:active { transform: scale(.97); }
-  .an-homepage-embed .share-btn svg { flex: 0 0 auto; }
-  .an-homepage-embed .share-btn.whatsapp { background-color: #25D366; }
-  .an-homepage-embed .share-btn.facebook { background-color: #1877F2; }
-  .an-homepage-embed .share-btn.x        { background-color: #000000; }
-  .an-homepage-embed .share-btn.bluesky  { background-color: #1185FE; }
-  .an-homepage-embed .share-btn.linkedin { background-color: #0A66C2; }
-  .an-homepage-embed .share-btn.copy     { background-color: #555555; }
+
+  /* 20. DAISY CHAIN - the pages of text + buttons injected into the thank-you
+     page by the module below (CONFIG: DAISY CHAIN). The tool's builder reads
+     the rules between the two markers to draw its own page editor with the
+     real styles, so keep everything chain-related inside them. The colour /
+     background / underline !importants are there because AN's own thank-you
+     link and button rules are id-scoped and would otherwise win. */
+  /* daisy-chain-css:start */
+  .an-homepage-embed .anw-chain { margin-top: 28px; text-align: center; }
+  .an-homepage-embed .anw-chain > * { margin: 0 0 16px; }
+  .an-homepage-embed .anw-chain > :last-child { margin-bottom: 0; }
+  .an-homepage-embed .anw-chain__text { font-size: 16px; line-height: 1.5; color: var(--body); }
+  .an-homepage-embed .anw-chain__text p { margin: 0 0 10px; font-size: inherit; }
+  .an-homepage-embed .anw-chain__text h3 {
+    font-family: var(--font-heading); font-weight: var(--heading-weight);
+    text-transform: var(--heading-transform); color: var(--body);
+    font-size: 22px; line-height: 1.3; margin: 0 0 10px;
+  }
+  .an-homepage-embed .anw-chain__text > :last-child { margin-bottom: 0; }
+  .an-homepage-embed .anw-chain__group { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .an-homepage-embed .anw-chain .anw-chain-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: auto; height: auto; margin: 0; padding: 12px 22px; box-sizing: border-box;
+    border: 2px solid transparent; border-radius: var(--button-radius);
+    font-family: var(--font-body); font-size: 15px; font-weight: 700; line-height: 1.2;
+    text-transform: var(--button-transform); letter-spacing: .4px;
+    text-decoration: none !important; cursor: pointer;
+    -webkit-appearance: none; appearance: none;
+    transition: opacity .2s ease, background-color .2s ease, transform .1s ease;
+  }
+  .an-homepage-embed .anw-chain .anw-chain-btn:active { transform: scale(.97); }
+  .an-homepage-embed .anw-chain .anw-chain-btn svg { flex: 0 0 auto; }
+  .an-homepage-embed .anw-chain .anw-chain-btn--primary {
+    background-color: var(--button-bg) !important; color: var(--button-text) !important;
+  }
+  .an-homepage-embed .anw-chain .anw-chain-btn--primary:hover { background-color: var(--button-bg-hover) !important; }
+  .an-homepage-embed .anw-chain .anw-chain-btn--outline {
+    background-color: transparent !important; color: var(--accent) !important; border-color: var(--accent);
+  }
+  .an-homepage-embed .anw-chain .anw-chain-btn--outline:hover { opacity: var(--hover-opacity); }
+  /* Network colours - share / copy-link buttons only. */
+  .an-homepage-embed .anw-chain .anw-chain-btn--network {
+    color: #fff !important; text-transform: none; letter-spacing: 0; font-weight: 500;
+  }
+  .an-homepage-embed .anw-chain .anw-chain-btn--network:hover { opacity: .85; }
+  .an-homepage-embed .anw-chain .anw-chain-btn--network.is-whatsapp { background-color: #25D366 !important; }
+  .an-homepage-embed .anw-chain .anw-chain-btn--network.is-facebook { background-color: #1877F2 !important; }
+  .an-homepage-embed .anw-chain .anw-chain-btn--network.is-x        { background-color: #000000 !important; }
+  .an-homepage-embed .anw-chain .anw-chain-btn--network.is-bluesky  { background-color: #1185FE !important; }
+  .an-homepage-embed .anw-chain .anw-chain-btn--network.is-linkedin { background-color: #0A66C2 !important; }
+  .an-homepage-embed .anw-chain .anw-chain-btn--network.is-copy     { background-color: #555555 !important; }
+  /* daisy-chain-css:end */
+  /* ANW_CHAIN.hideThankYouText - the chain replaces AN's own thank-you copy. */
+  .an-homepage-embed #can_thank_you.anw-chain-only > *:not(.anw-chain) { display: none !important; }
+  .an-homepage-embed #can_thank_you.anw-chain-only > .anw-chain { margin-top: 0; }
 
   </style>
 
@@ -658,9 +882,18 @@
          some orgs / payment processors - enable only with the client's sign-off. */
       recurringPretick: false,
 
+      /* Stack the description sidebar on fundraiser pages: one column of
+         amount raised, title, description, then the donation form. Relies on
+         the iframe injector below. (Hiding the sidebar wins if both are on.) */
+      stackFundraiserSidebar: false,
+
       /* Hide the description sidebar on fundraiser pages so the donation form
          goes full width. Relies on the iframe injector below. */
       hideFundraiserSidebar: false,
+
+      /* Hide AN's "Contributions will go to" recipient line on fundraiser
+         pages. Relies on the iframe injector below. */
+      hideDonationRecipient: false,
 
       /* Hide AN's "sponsored by" / "petition by" attribution line.
          true  = hidden (default - the an-hide-sponsor body class is on by default)
@@ -671,29 +904,60 @@
          donation form uses the brand font. Keep in sync with the <link> above. */
       fontUrl: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap",
 
-      /* Share buttons on the thank-you page.
-         shareButtons   - master on/off for the whole widget.
-         shareLabel     - the prompt line shown above the buttons.
-         sharePlatforms - turn individual networks on/off. */
-      shareButtons: true,
-      shareLabel: "Share this with your network",
-      sharePlatforms: {
-        whatsapp: true,
-        facebook: true,
-        x:        false,
-        bluesky:  false,
-        linkedin: false,
-        copy:     true
-      }
+      /* Floating "jump to action" button, mobile only. Scrolls from the
+         intro content straight to the form; hides once the form is in view.
+         jumpToAction      - master on/off.
+         jumpToActionLabel - the button's text. */
+      jumpToAction: true,
+      jumpToActionLabel: "Take action"
     };
 
-    /* Sponsored-by: hidden by default via the an-hide-sponsor body class.
-       Only act when the client has opted to SHOW it. */
-    document.addEventListener('DOMContentLoaded', function () {
-      if (window.ANW && window.ANW.hideSponsoredBy === false) {
-        document.body.classList.remove('an-hide-sponsor');
-      }
-    });
+    /* SHARED HELPERS for the modules below.
+       ANW.type()    - the action type: petition | letter | form | event |
+                       fundraiser, from the AN page address (/petitions/...),
+                       falling back to the widget's mount div; "default" if
+                       neither says yet. Also added to <body> as anw-type-*.
+       ANW.hasIframes() - whether this type can render inside an iframe
+                       (donations, ticketed events), so iframe work is skipped
+                       on petitions, letters and forms.
+       ANW.watch(fn) - ONE shared MutationObserver for the whole page instead
+                       of one per module; fn runs now and on every DOM change
+                       until it returns true. */
+    (function () {
+      'use strict';
+      var ANW = window.ANW, fns = [], known = null;
+      var BY_PATH = { petitions: 'petition', letters: 'letter', forms: 'form', events: 'event',
+                      ticketed_events: 'event', event_campaigns: 'event', fundraising: 'fundraiser' };
+      var BY_MOUNT = { petition: 'petition', letter: 'letter', form: 'form', event: 'event',
+                       ticketed_event: 'event', fundraising: 'fundraiser' };
+      ANW.type = function () {
+        if (window.ANW_CHAIN_TYPE) return window.ANW_CHAIN_TYPE;   // the tool's preview
+        if (known) return known;
+        var seg = (window.location.pathname.split('/')[1] || '').toLowerCase();
+        if (BY_PATH[seg]) return (known = BY_PATH[seg]);
+        for (var k in BY_MOUNT) {
+          if (document.querySelector('[id^="can-' + k + '-area"]')) return (known = BY_MOUNT[k]);
+        }
+        return 'default';   // not remembered - the widget may just not have rendered yet
+      };
+      ANW.hasIframes = function () {
+        var t = ANW.type();
+        return t === 'fundraiser' || t === 'event' || t === 'default';
+      };
+      ANW.watch = function (fn) { if (!fn()) fns.push(fn); };
+      new MutationObserver(function () {
+        for (var i = fns.length - 1; i >= 0; i--) if (fns[i]()) fns.splice(i, 1);
+      }).observe(document.documentElement, { childList: true, subtree: true });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        /* Sponsored-by is hidden by the an-hide-sponsor body class by default;
+           only act when the client has opted to SHOW it. */
+        if (ANW.hideSponsoredBy === false) document.body.classList.remove('an-hide-sponsor');
+        document.body.classList.add('anw-type-' + ANW.type());
+        /* Single-column fundraisers get their own content width (CSS 3b). */
+        if (ANW.stackFundraiserSidebar || ANW.hideFundraiserSidebar) document.body.classList.add('anw-fundraiser-narrow');
+      });
+    })();
   </script>
 
   <script>
@@ -704,6 +968,7 @@
        <style id="anw-embed-css"> textContent - single source, no URL. */
     (function () {
       'use strict';
+      if (!window.ANW.hasIframes()) return;   // petitions, letters, forms - nothing to style
       var styleEl = document.getElementById('anw-embed-css');
       var CSS_TEXT = styleEl ? styleEl.textContent : '';
 
@@ -718,7 +983,24 @@
           if (!doc || !doc.head || !doc.body) return false;
           doc.body.classList.add('an-homepage-embed');
           if (window.ANW.hideFundraiserSidebar) doc.body.classList.add('an-hide-sidebar');
+          if (window.ANW.stackFundraiserSidebar) doc.body.classList.add('an-stack-sidebar');
+          if (window.ANW.hideDonationRecipient) doc.body.classList.add('an-hide-recipient');
           if (window.ANW.hideSponsoredBy !== false) doc.body.classList.add('an-hide-sponsor');
+          /* Currency symbol for the "Other" amount (see CSS 9b): AN's
+             placeholder is e.g. "£ Other", so take whatever comes before the
+             word. Placed where the input's text starts. */
+          var other = doc.querySelector('label.other_label');
+          var oi = other && other.querySelector('input.other_input');
+          if (oi && !other.hasAttribute('data-anw-currency')) {
+            var sym = (oi.getAttribute('placeholder') || '').split(/\s+/)[0];
+            if (sym && !/[A-Za-z0-9]/.test(sym)) {
+              other.setAttribute('data-anw-currency', sym);
+              var lr = other.getBoundingClientRect(), ir = oi.getBoundingClientRect();
+              var pad = parseFloat(doc.defaultView.getComputedStyle(oi).paddingLeft) || 13;
+              if (ir.width) other.style.setProperty('--anw-currency-left', (ir.left - lr.left + pad) + 'px');
+              other.style.setProperty('--anw-currency-pad', pad + 'px');
+            }
+          }
           if (doc.getElementById('anw-iframe-styles')) return true;
           if (window.ANW.fontUrl) {
             var fl = doc.createElement('link');
@@ -760,8 +1042,7 @@
       }, 250);
 
       /* Also react immediately when an iframe is (re)added to the DOM. */
-      var observer = new MutationObserver(sweep);
-      observer.observe(document.documentElement, { childList: true, subtree: true });
+      window.ANW.watch(function () { sweep(); return false; });
     })();
   </script>
 
@@ -774,7 +1055,11 @@
     (function () {
       'use strict';
       if (!(window.ANW && window.ANW.recurringPretick)) return;
-      var tries = 0, MAX = 80; // ~24s at 300ms
+      var t = window.ANW.type();
+      if (t !== 'fundraiser' && t !== 'default') return;
+      var tries = 0, MAX = 80;            // ~24s at 300ms to find the form
+      var held = 0, HOLD = 27;            // then ~8s of keeping Monthly
+      var userPicked = false;
       var timer = setInterval(function () {
         tries++;
         var iframe = document.querySelector('[id^="can-fundraising-area"] iframe, iframe#can_embed_iframe');
@@ -783,8 +1068,28 @@
             var doc = iframe.contentDocument || iframe.contentWindow.document;
             var cb = doc && doc.querySelector('input[name="donation[recurring]"]');
             if (cb) {
-              clearInterval(timer);
               if (!cb._anwDone) { cb._anwDone = true; if (!cb.checked) cb.click(); }
+              /* AN's frequency dropdown defaults to Weekly - start on Monthly.
+                 AN's own script resets it to Weekly while it initialises,
+                 which can be AFTER we first set it, so keep re-applying for a
+                 few seconds - and stop for good the moment the visitor picks
+                 a frequency themselves (a trusted change event). A bubbling
+                 change lets AN's (jQuery) handlers see ours; the styled
+                 label is set directly too. */
+              var period = doc.querySelector('select[name="donation[recurring_period]"]');
+              if (period && period.querySelector('option[value="recurring_monthly"]')) {
+                if (!period._anwWatched) {
+                  period._anwWatched = true;
+                  period.addEventListener('change', function (e) { if (e.isTrusted) userPicked = true; });
+                }
+                if (!userPicked && period.value !== 'recurring_monthly') {
+                  period.value = 'recurring_monthly';
+                  period.dispatchEvent(new doc.defaultView.Event('change', { bubbles: true }));
+                  var shown = period.parentNode.querySelector('.can_selectInner');
+                  if (shown) shown.textContent = period.options[period.selectedIndex].text;
+                }
+              }
+              if (userPicked || ++held >= HOLD) clearInterval(timer);
               return;
             }
           } catch (e) { /* iframe not ready / cross-origin transient */ }
@@ -795,17 +1100,60 @@
   </script>
 
   <script>
-    /* MODULE: social share buttons on the thank-you page.
-       After a successful action AN adds .can_thank_you_wrap to #can_embed_form
-       and injects #can_thank_you (petition / form / letter thank-yous render
-       inline). We watch for that node and append the share row once. Which
-       networks show is driven by ANW.sharePlatforms; master on/off is
-       ANW.shareButtons; the prompt is ANW.shareLabel. Networks are real
-       <a target="_blank"> links (clean new tab, no popup); "Copy link" copies
-       the current page URL to the clipboard. */
+    /* =====================================================================
+       CONFIG: DAISY CHAIN - what people see on the thank-you page after they
+       take action: one or more "pages" of text and buttons, where a button can
+       lead to another page, open a link, or share the action. Build it in the
+       tool's Daisy chain tab rather than by hand - this is its saved output
+       (plain JSON, which is what lets Import Saved Wrapper read it back).
+         enabled          - master on/off.
+         hideThankYouText - true = the chain replaces AN's own thank-you copy.
+         copiedText       - what a copy-link button says once pressed.
+         textLinksNewTab  - links typed into text open in a new tab (link
+                            buttons have their own newTab; shares always do).
+         starts           - which page opens first, per action type (petition,
+                            letter, form); "default" covers any not listed.
+                            Events and fundraisers never show the chain.
+         pages[].blocks   - text | button | group (buttons side by side) |
+                            share (a ready-made row of share buttons).
+         x / y / ui       - layout of the tool's flow diagram only.
+       ===================================================================== */
+    /* daisy-chain:start */
+    window.ANW_CHAIN = {
+      "enabled": false,
+      "hideThankYouText": false,
+      "copiedText": "Copied!",
+      "textLinksNewTab": true,
+      "starts": { "default": "p1" },
+      "ui": { "start": { "x": 40, "y": 60 } },
+      "pages": [
+        {
+          "id": "p1", "name": "Share", "x": 360, "y": 40,
+          "blocks": [
+            { "id": "b1", "type": "text", "html": "<p><strong>Share this with your network</strong></p>" },
+            { "id": "b2", "type": "share", "nets": ["whatsapp", "facebook", "copy"], "labels": {}, "message": "" }
+          ]
+        }
+      ]
+    };
+    /* daisy-chain:end */
+  </script>
+
+  <script>
+    /* MODULE: daisy chain on the thank-you page (window.ANW_CHAIN above).
+       Petitions, letters and forms only: after a successful action AN adds
+       .can_thank_you_wrap to #can_embed_form and injects #can_thank_you inline,
+       which we watch for and append the chain's starting page to once; buttons
+       then swap pages in place. Events and fundraisers keep AN's own thank-you
+       page (fundraisers move on to a separate one the wrapper can't reach). Network
+       and link buttons are real <a target="_blank"> links (clean new tab, no
+       popup); copy-link buttons copy the current page URL to the clipboard. */
     (function () {
       'use strict';
-      if (window.ANW && window.ANW.shareButtons === false) return;
+      var CHAIN = window.ANW_CHAIN;
+      if (!CHAIN || CHAIN.enabled === false || !CHAIN.pages || !CHAIN.pages.length) return;
+      var TYPE = window.ANW.type();
+      if (TYPE === 'event' || TYPE === 'fundraiser') return;
 
       var ICON = {
         whatsapp: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>',
@@ -815,62 +1163,146 @@
         linkedin: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>',
         copy:     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
       };
-      var TEXT = {
+      var NET_TEXT = {
         whatsapp: 'Share on WhatsApp', facebook: 'Share on Facebook',
         x: 'Share on X', bluesky: 'Share on Bluesky', linkedin: 'Share on LinkedIn',
         copy: 'Copy link'
       };
-      var ORDER = ['whatsapp', 'facebook', 'x', 'bluesky', 'linkedin', 'copy'];
-      var PLATS = (window.ANW && window.ANW.sharePlatforms) || { whatsapp: true, facebook: true };
-      var LABEL = (window.ANW && window.ANW.shareLabel) || 'Share this with your network';
 
-      /* encodeURIComponent escapes quotes/&/<> too, so the result is safe to drop
-         straight into a double-quoted href attribute. */
-      function linkFor(net, title, href) {
+
+      function pageById(id) {
+        for (var i = 0; i < CHAIN.pages.length; i++) if (CHAIN.pages[i].id === id) return CHAIN.pages[i];
+        return null;
+      }
+
+      /* Only let ordinary links through - never javascript: and friends. */
+      function safeUrl(u) {
+        u = String(u || '').replace(/^\s+/, '');
+        return /^(https?:|mailto:|tel:|\/|#)/i.test(u) ? u : '#';
+      }
+
+      /* REFERRAL TRACKING - every link the chain sends people along is tagged
+         with where it came from, so it shows in reports:
+           shares / copy link (back to this action) - AN's own source code,
+             source=daisychain-share-<network> / daisychain-copy-link
+           "open a link" buttons - utm_source=actionnetwork, utm_medium=daisychain,
+             utm_campaign=<this action's slug>, utm_content=<button text>; links to
+             another Action Network page also get source=daisychain-<slug>.
+         Parameters already in a link the author typed are never overwritten. */
+      var SLUG = (window.location.pathname.split('/')[2] || '').toLowerCase() || 'action';
+      function codeOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+      }
+      function tag(url, params, replace) {
+        var u;
+        try { u = new URL(url, window.location.href); } catch (e) { return url; }
+        if (!/^https?:$/.test(u.protocol)) return url;
+        for (var k in params) {
+          if (replace || !u.searchParams.has(k)) u.searchParams.set(k, params[k]);
+        }
+        return u.toString();
+      }
+      /* The action's own address, without the visitor's incoming query
+         (their own ?source= etc.) - shares start a fresh, labelled trail. */
+      function actionUrl(code) {
+        var base = window.location.href.split(/[?#]/)[0];
+        return tag(base, { source: code }, true);
+      }
+      function outboundUrl(url, label) {
+        if (url === '#') return url;
+        var p = { utm_source: 'actionnetwork', utm_medium: 'daisychain',
+                  utm_campaign: SLUG, utm_content: codeOf(label) || 'button' };
+        var host = '';
+        try { host = new URL(url, window.location.href).hostname; } catch (e) {}
+        if (/(^|\.)actionnetwork\.org$/i.test(host)) p.source = 'daisychain-' + SLUG;
+        return tag(url, p, false);
+      }
+
+      /* A custom message may place the link / action title itself with {link}
+         and {title}; otherwise the link is added after it. encodeURIComponent
+         escapes quotes/&/<> too, so the result is safe inside an href. */
+      function shareHref(net, message, title, href) {
+        var custom = String(message || '');
+        var hasLink = custom.indexOf('{link}') !== -1;
+        var text = (custom || title).replace(/\{title\}/g, title).replace(/\{link\}/g, href);
+        var enc = encodeURIComponent;
         switch (net) {
-          case 'whatsapp': return 'https://wa.me/?text=' + encodeURIComponent(title + '\n' + href);
-          case 'facebook': return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(href);
-          case 'x':        return 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(href);
-          case 'bluesky':  return 'https://bsky.app/intent/compose?text=' + encodeURIComponent(title + ' ' + href);
-          case 'linkedin': return 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(href);
+          case 'whatsapp': return 'https://wa.me/?text=' + enc(hasLink ? text : text + '\n' + href);
+          case 'facebook': return 'https://www.facebook.com/sharer/sharer.php?u=' + enc(href);
+          case 'x':        return 'https://twitter.com/intent/tweet?text=' + enc(text) + (hasLink ? '' : '&url=' + enc(href));
+          case 'bluesky':  return 'https://bsky.app/intent/compose?text=' + enc(hasLink ? text : text + ' ' + href);
+          case 'linkedin': return 'https://www.linkedin.com/sharing/share-offsite/?url=' + enc(href);
         }
         return '#';
       }
 
-      function build() {
-        var href = window.location.href, title = document.title, html = '';
-        ORDER.forEach(function (net) {
-          if (!PLATS[net]) return;
-          var inner = ICON[net] + '<span class="anw-btn-text">' + TEXT[net] + '</span>';
-          if (net === 'copy') {
-            html += '<button type="button" class="share-btn copy" data-net="copy">' + inner + '</button>';
-          } else {
-            /* Real anchor + target="_blank" - browser opens a clean new tab. */
-            html += '<a class="share-btn ' + net + '" target="_blank" rel="noopener noreferrer" href="' + linkFor(net, title, href) + '">' + inner + '</a>';
+      function buttonEl(doc, b) {
+        var kind = b.action || 'page';
+        var net = kind === 'copy' ? 'copy' : (kind === 'share' ? b.net : '');
+        var style = b.style || 'primary';
+        if (style === 'network' && !net) style = 'primary';
+        var el;
+        if (kind === 'share' || kind === 'url') {
+          el = doc.createElement('a');
+          el.href = kind === 'share'
+            ? shareHref(b.net, b.message, document.title, actionUrl('daisychain-share-' + b.net))
+            : outboundUrl(safeUrl(b.url), b.label);
+          if (kind === 'share' || b.newTab !== false) { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
+        } else {
+          el = doc.createElement('button');
+          el.type = 'button';
+          if (kind === 'copy') el.setAttribute('data-copy', '1');
+          else el.setAttribute('data-page', b.page || '');
+        }
+        el.className = 'anw-chain-btn anw-chain-btn--' + style + (style === 'network' ? ' is-' + net : '');
+        el.innerHTML = (net && ICON[net] ? ICON[net] : '') + '<span class="anw-chain-btn__text"></span>';
+        el.querySelector('.anw-chain-btn__text').textContent = b.label || NET_TEXT[net] || 'Continue';   // text node, no HTML injection
+        return el;
+      }
+
+      function groupEl(doc, buttons) {
+        var g = doc.createElement('div');
+        g.className = 'anw-chain__group';
+        for (var i = 0; i < buttons.length; i++) g.appendChild(buttonEl(doc, buttons[i]));
+        return g;
+      }
+
+      function show(wrap, page) {
+        var doc = wrap.ownerDocument;
+        wrap.innerHTML = '';
+        wrap.setAttribute('data-chain-page', page.id);
+        (page.blocks || []).forEach(function (blk) {
+          if (blk.type === 'text') {
+            var t = doc.createElement('div');
+            t.className = 'anw-chain__text';
+            t.innerHTML = blk.html || '';   // the wrapper author's own rich text
+            /* Links typed into text get the same tracking and tab choice. */
+            var links = t.querySelectorAll('a[href]');
+            for (var i = 0; i < links.length; i++) {
+              var a = links[i];
+              a.setAttribute('href', outboundUrl(safeUrl(a.getAttribute('href')), a.textContent));
+              if (CHAIN.textLinksNewTab !== false) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+              else { a.removeAttribute('target'); }
+            }
+            wrap.appendChild(t);
+          } else if (blk.type === 'button') {
+            wrap.appendChild(groupEl(doc, [blk]));
+          } else if (blk.type === 'group') {
+            if (blk.buttons && blk.buttons.length) wrap.appendChild(groupEl(doc, blk.buttons));
+          } else if (blk.type === 'share') {
+            var btns = (blk.nets || []).map(function (net) {
+              return { action: net === 'copy' ? 'copy' : 'share', net: net, style: 'network',
+                       label: (blk.labels && blk.labels[net]) || '', message: blk.message };
+            });
+            if (btns.length) wrap.appendChild(groupEl(doc, btns));
           }
         });
-        if (!html) return null;   // every network turned off
-
-        var wrap = document.createElement('div');
-        wrap.className = 'anw-share';
-        wrap.innerHTML = '<p class="anw-share__label"></p><div class="share-buttons">' + html + '</div>';
-        wrap.querySelector('.anw-share__label').textContent = LABEL;   // text node, no HTML injection
-
-        wrap.addEventListener('click', function (e) {
-          var btn = e.target.closest ? e.target.closest('.share-btn') : null;
-          if (!btn) return;
-          e.stopPropagation();   /* keep the click out of AN's #can_embed_form handlers */
-          if (btn.getAttribute('data-net') !== 'copy') return;   /* anchors: native new tab */
-          e.preventDefault();
-          copyLink(window.location.href, btn);
-        });
-        return wrap;
       }
 
       function copyLink(text, btn) {
         function flash() {
-          var t = btn.querySelector('.anw-btn-text'); if (!t) return;
-          var prev = t.textContent; t.textContent = 'Copied!';
+          var t = btn.querySelector('.anw-chain-btn__text'); if (!t) return;
+          var prev = t.textContent; t.textContent = CHAIN.copiedText || 'Copied!';
           setTimeout(function () { t.textContent = prev; }, 1600);
         }
         function fallback() {
@@ -885,20 +1317,116 @@
         } else { fallback(); }
       }
 
+      function build(doc) {
+        var starts = CHAIN.starts || {};
+        var first = pageById(starts[window.ANW.type()]) || pageById(starts['default']) || CHAIN.pages[0];
+        var wrap = doc.createElement('div');
+        wrap.className = 'anw-chain';
+        show(wrap, first);
+        wrap.addEventListener('click', function (e) {
+          var btn = e.target.closest ? e.target.closest('.anw-chain-btn') : null;
+          if (!btn) return;
+          e.stopPropagation();   /* keep the click out of AN's #can_embed_form handlers */
+          if (btn.getAttribute('data-copy')) {
+            e.preventDefault();
+            copyLink(actionUrl('daisychain-copy-link'), btn);
+          } else if (btn.hasAttribute('data-page')) {
+            e.preventDefault();
+            var next = pageById(btn.getAttribute('data-page'));
+            if (!next) return;
+            show(wrap, next);
+            /* The new page may be shorter/taller - keep its top in view. */
+            if (wrap.getBoundingClientRect().top < 0 && wrap.scrollIntoView) wrap.scrollIntoView({ block: 'start' });
+          }
+          /* anchors: native navigation / new tab */
+        });
+        return wrap;
+      }
+
+      function findThankYou() {
+        return document.getElementById('can_thank_you') ||
+               document.querySelector('#can_embed_form.can_thank_you_wrap');
+      }
+
       function place() {
-        var ty = document.getElementById('can_thank_you') ||
-                 document.querySelector('#can_embed_form.can_thank_you_wrap');
+        var ty = findThankYou();
         if (!ty) return false;
-        if (ty.querySelector('.anw-share')) return true;   // already added
-        var row = build();
-        if (row) ty.appendChild(row);
+        if (ty.querySelector('.anw-chain')) return true;   // already added
+        ty.appendChild(build(ty.ownerDocument));
+        if (CHAIN.hideThankYouText && ty.id === 'can_thank_you') ty.classList.add('anw-chain-only');
         return true;
       }
 
-      if (!place()) {
-        var obs = new MutationObserver(function () { if (place()) obs.disconnect(); });
-        obs.observe(document.documentElement, { childList: true, subtree: true });
+      /* The shared page watcher catches the inline thank-you straight away. */
+      window.ANW.watch(place);
+    })();
+  </script>
+
+  <script>
+    /* MODULE: mobile "jump to action" button (ANW.jumpToAction). On narrow
+       viewports the intro content and the form stack vertically, so we float
+       a button at the bottom of the screen that scrolls straight to the
+       form. Not on fundraisers - the donation form is the page there. CSS
+       keeps it desktop-hidden; here we just track visibility: shown while
+       the form (#can_sidebar) is still below the viewport, hidden once it's
+       reached or passed. The
+       form loads async and is replaced by the thank-you markup after a
+       successful action, so we re-resolve the target on every DOM mutation
+       rather than finding it once. */
+    (function () {
+      'use strict';
+      if (window.ANW && window.ANW.jumpToAction === false) return;
+      if (window.ANW.type() === 'fundraiser') return;
+
+      var LABEL = (window.ANW && window.ANW.jumpToActionLabel) || 'Take action';
+      var btn, io, currentTarget;
+
+      function findTarget() {
+        /* Nothing left to jump to once the action has been taken. */
+        if (document.querySelector('#can_thank_you, #can_embed_form.can_thank_you_wrap')) return null;
+        return document.querySelector('#can_sidebar');
       }
+
+      function build() {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'anw-jump';
+        btn.innerHTML = '<span class="anw-jump__text"></span>' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16M5 13l7 7 7-7"/></svg>';
+        btn.querySelector('.anw-jump__text').textContent = LABEL;   // text node, no HTML injection
+        btn.addEventListener('click', function () {
+          if (currentTarget) currentTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        document.body.appendChild(btn);
+      }
+
+      function watch(target) {
+        currentTarget = target;
+        if (io) io.disconnect();
+        io = new IntersectionObserver(function (entries) {
+          var entry = entries[0];
+          /* Still ahead (below the viewport) and not yet reached = intro state. */
+          var showIntro = !entry.isIntersecting && entry.boundingClientRect.top > 0;
+          btn.classList.toggle('is-visible', showIntro);
+        }, { threshold: 0 });
+        io.observe(target);
+      }
+
+      function sync() {
+        if (!document.body || !window.IntersectionObserver) return;
+        var target = findTarget();
+        if (!target) {
+          if (btn) btn.classList.remove('is-visible');
+          currentTarget = null;
+          if (io) { io.disconnect(); io = null; }
+          return;
+        }
+        if (target === currentTarget) return;
+        if (!btn) build();
+        watch(target);
+      }
+
+      window.ANW.watch(function () { sync(); return false; });
     })();
   </script>
 
@@ -964,12 +1492,7 @@
           }
           return false;
         }
-        if (!check()) {
-          var observer = new MutationObserver(function () {
-            if (check()) { observer.disconnect(); }
-          });
-          observer.observe(document.body, { childList: true, subtree: true });
-        }
+        window.ANW.watch(check);
       })();
     </script>
 

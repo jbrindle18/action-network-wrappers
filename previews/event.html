@@ -163,36 +163,25 @@ this file the same way (see README.md).
   @sharing_card_lists is an intance of SharingCardLists, a presenter inside app/presenters
   resnponsible for building a list of subscription lists.
 -->
-<li id="d_sharing" class="js-d_sharing">
-  <ul>
-      <li>
-          You may receive email updates from
-          <em>Solidarity Studio,</em>
-          the sponsor of this event.
-      </li>
-
-    <li><a id="edit_d_sharing_opts" class="js-edit_d_sharing_opts">Edit Subscription Preferences</a><a id="edit_d_sharing_opts-close" class="js-edit_d_sharing_opts-close">Close Preferences</a></li>
-    <li id="d_sharing_opts" class="js-d_sharing_opts">
-      <ul>
-          <li>
-            <label>
-
-                <input type="checkbox" name="subscription[group]" value="375965" id="name_optin1" checked="checked">
-                <input type="hidden" name="subscription[sub_group_id]" value="375965">
-                Opt in to email updates from Solidarity Studio
-
-            </label>
-          </li>
-
-
-
-
-
-        <input type="hidden" name="subscription[http_referer]" value="localhost">
-        <input id="subscription_source" name="subscription[source]" type="hidden" value="widget">
-
-      </ul>
+<li id="d_sharing" class="js-d_sharing affirmative_optin_d_sharing">
+  <ul class="nomb">
+    <li class="control-group js-affirmative_optin_control_group nomt">
+      <label class="control-label check_radio_label noml nomt nomb">If you are not already subscribed, would you like to receive email updates from Solidarity Studio ? *</label>
+      <span class="controls check_radio_field">
+        <label class="radio noml nomb mt5">
+          <input type="radio" name="subscription[group]" value="375965" class="js-affirmative_optin_radio"> Yes, opt in to email updates
+        </label>
+        <label class="radio noml nomt">
+          <input type="radio" name="subscription[group]" value="invalid" class="js-affirmative_optin_radio js-affirmative_optin_radio_no"> No, do not opt in
+        </label>
+      </span>
+      <input type="hidden" name="subscription[sub_group_id]" value="375965">
     </li>
+    <div class="affirmative_note">
+      <small><em>Note: If you subscribed earlier, this will not unsubscribe you. You can unsubscribe using the link provided in emails you receive. You can always take action without opting in.</em></small>
+    </div>
+    <input type="hidden" name="subscription[http_referer]" value="">
+    <input id="subscription_source" name="subscription[source]" type="hidden" value="">
   </ul>
 </li>
 
