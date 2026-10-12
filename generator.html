@@ -1526,7 +1526,14 @@ function chk(label,key,hint){
     (hint?'<div class="hint" style="margin:-4px 0 8px 24px">'+hint+'</div>':'');
 }
 /* ---- wire up inputs --------------------------------------------------- */
+/* Delegated listeners on #formRoot, which survives every renderForm() (only
+   its contents are replaced) - so they're attached ONCE. Re-attaching on
+   each render stacked copies of the anonymous handlers below, and e.g. the
+   footer's link button then opened its prompt once per render so far. */
+var formWired = false;
 function wireForm(){
+  if(formWired) return;
+  formWired = true;
   $("formRoot").addEventListener("input", onFormInput);
   $("formRoot").addEventListener("change", onFormInput);
   /* Rich-text toolbar (Footer text): keep focus/selection in the
