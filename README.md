@@ -27,7 +27,7 @@ because GitHub Pages serves `main` and Webflow just frames it.
 | File | What it is |
 |------|------------|
 | `wrapper.html` | **The deliverable and the single source of truth.** A self-contained AN page wrapper — all CSS is inline in `<style id="anw-embed-css">`, all JS is inline; the only asset you upload is the logo. Section 0 holds the theme tokens. |
-| `generator.html` | The themeing tool. **Bakes a copy of `wrapper.html` into itself as base64** (`<script id="masterB64">`) and decodes it on boot — no network fetch. Renders a form from the tokens, rebuilds a themed wrapper, and offers Copy Header / Copy Footer / Save / Import. |
+| `generator.html` | The themeing tool. **Bakes a copy of `wrapper.html` into itself as base64** (`<script id="masterB64">`) and decodes it on boot — no network fetch. Renders a form from the tokens, rebuilds a themed wrapper, and offers Add to Action Network (copy header / footer), Save and Open. |
 | `rebake.py` | Refreshes the base64 copy of `wrapper.html` inside `generator.html`. **Run after every `wrapper.html` edit** (see below). |
 | `webflow-embed.html` | The `<iframe>` + auto-resize snippet to paste into a Webflow Embed element. |
 | `Centrul Filia Wrapper.html` | A real themed wrapper (Centrul Filia), kept as a worked example. |
@@ -49,21 +49,23 @@ is UTF-8-safe (handles £, em-dashes, etc.).
 
 ## Using the tool (the normal, no-code workflow)
 
-1. Open the tool. Work through the sections — logo, colours, fonts, layout,
-   footer, then the thank-you **Daisy chain**.
-2. **Copy Header** → paste into the **Header** box of your AN page wrapper.
-   **Copy Footer** → paste into the **Footer** box.
-   (In AN: Details → Page Wrappers → Add New Wrapper.)
-   What's copied is the wrapper minus its explanatory comments (about half the
-   size), plus a one-line note pointing back to the tool. **Save Wrapper** keeps
-   the fully-commented file.
-3. Save in AN; set your action to use that wrapper.
-4. **Save Wrapper** keeps a `wrapper.html` file. Next time, **Import Saved
-   Wrapper** reads its settings (colours, fonts, logo, layout, modules, share,
-   footer) and applies them onto the **latest** template — so you keep every
-   later fix/feature instead of resurrecting the old file. Renamed tokens are
-   migrated automatically (e.g. an old single brand colour fans out to the new
-   button / progress-bar / heading colours).
+1. Open the tool. Work down the rail on the left — Logo, Colours, Fonts,
+   Layout, Shape, Footer — then **Thank-you** for the daisy chain. The preview
+   on the right (Petition / Event / Fundraiser, desktop or mobile) updates as
+   you go; Colours also shows a readability (contrast) check.
+2. **Add to Action Network** (top right) opens a four-step dialog: create the
+   wrapper in AN (Details → Page Wrappers → Add New Wrapper), **Copy header**
+   into its Header box, **Copy footer** into its Footer box, then save, preview
+   and switch your action to it. What's copied is the wrapper minus its
+   explanatory comments (about half the size), plus a one-line note pointing
+   back to the tool.
+3. **Save** (top bar, or in the dialog) downloads the fully-commented
+   `wrapper.html`. Next time, **Open** reads its settings (colours, fonts, logo,
+   layout, modules, thank-you pages, footer) and applies them onto the
+   **latest** template — so you keep every later fix/feature instead of
+   resurrecting the old file. Renamed tokens are migrated automatically (e.g.
+   an old single brand colour fans out to the new button / accent colours).
+4. The **⋯** menu has How it works and Reset to defaults.
 
 Always check the result in AN's own page-wrapper **Preview** before going live.
 
@@ -312,10 +314,9 @@ Pick a class on `.gen_wrapper` (CONFIG: LAYOUT):
 
 `generator.html` is a static file served from GitHub Pages (`main` branch,
 root). To update: edit, **re-bake if `wrapper.html` changed**, commit, push.
-Pages rebuilds in ~1–2 min. The Webflow page frames it via `webflow-embed.html`;
-the iframe auto-grows to the tool's height via `postMessage`. The section
-sidebar shows in the embed when the container is ≥ 860px wide; below that a
-section dropdown replaces it.
+Pages rebuilds in ~1–2 min. The Webflow page frames it via `webflow-embed.html`
+at a fixed height (85vh by default; the tool scrolls inside it). Below 980px
+wide the settings and the preview stack and the page scrolls instead.
 
 ## Notes / gotchas
 

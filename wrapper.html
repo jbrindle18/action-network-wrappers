@@ -832,6 +832,7 @@
   }
   .an-homepage-embed .anw-chain__text > :last-child { margin-bottom: 0; }
   .an-homepage-embed .anw-chain__group { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .an-homepage-embed .anw-chain__img { display: block; max-width: 100%; height: auto; margin-left: auto; margin-right: auto; border-radius: var(--card-radius); }
   .an-homepage-embed .anw-chain .anw-chain-btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     width: auto; height: auto; margin: 0; padding: 12px 22px; box-sizing: border-box;
@@ -1115,7 +1116,8 @@
                             letter, form); "default" covers any not listed.
                             Events and fundraisers never show the chain.
          pages[].blocks   - text | button | group (buttons side by side) |
-                            share (a ready-made row of share buttons).
+                            share (a ready-made row of share buttons) |
+                            image (src + alt).
          x / y / ui       - layout of the tool's flow diagram only.
        ===================================================================== */
     /* daisy-chain:start */
@@ -1289,6 +1291,13 @@
             wrap.appendChild(groupEl(doc, [blk]));
           } else if (blk.type === 'group') {
             if (blk.buttons && blk.buttons.length) wrap.appendChild(groupEl(doc, blk.buttons));
+          } else if (blk.type === 'image') {
+            if (/^https?:\/\//i.test(blk.src || '')) {   /* only ordinary web images */
+              var im = doc.createElement('img');
+              im.className = 'anw-chain__img';
+              im.src = blk.src; im.alt = blk.alt || '';
+              wrap.appendChild(im);
+            }
           } else if (blk.type === 'share') {
             var btns = (blk.nets || []).map(function (net) {
               return { action: net === 'copy' ? 'copy' : 'share', net: net, style: 'network',
