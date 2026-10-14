@@ -238,6 +238,12 @@ window.ANW = {
   CSS: `display:contents` dissolves AN's two column boxes (`#can_main_col`,
   `#can_sidebar`) so `order` can interleave their children. "Hide the
   description sidebar" wins if both are on.
+- **Sticky form column** *(toggle, ships ON)* — on desktop (768px+), in the
+  side-by-side layouts, `#can_sidebar` is `position: sticky; top: 24px`, so the
+  form stays in view while a long description scrolls past. The CSS keys off
+  an `anw-sticky-on` body class that a small check only sets while the form
+  column fits in the window (re-checked as the form renders and on resize), so
+  a long form never has its submit button stuck below the screen.
 - **Fundraiser width** — with the sidebar stacked or hidden, fundraiser pages
   use `--fundraiser-max` (default 850px) instead of `--wrapper-max` for the
   content area. In the tool it appears under those two options only while one

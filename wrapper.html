@@ -699,6 +699,21 @@
     .an-homepage-embed .gen_wrapper #can_embed_form > .clearfix #can_main_col { width: 56%; margin-bottom: 0; }
   }
 
+  /* 12b. STICKY FORM COLUMN [MODULE - ANW.stickySidebar]. The form column
+     stays in view while the description scrolls past it - desktop two-column
+     layouts only (the flex parent uses align-items: flex-start, so the
+     sidebar isn't stretched full-height and sticky has room to move). The
+     anw-sticky-on body class is only set while the column fits on screen,
+     so a long form never has its bottom (and submit button) stuck off-screen. */
+  @media (min-width: 768px) {
+    .an-homepage-embed.anw-sticky-on .gen_wrapper:not(.layout--full) #can_embed_form > .clearfix #can_sidebar,
+    .an-homepage-embed.anw-sticky-on .can_embed #can_embed_form > .clearfix #can_sidebar,
+    .an-homepage-embed.anw-sticky-on .can_embed #can_embed_form > div > .clearfix #can_sidebar {
+      position: sticky;
+      top: 24px;
+    }
+  }
+
   /* 13. CLEARFIX PSEUDO-ELEMENT FIX */
   .an-homepage-embed #can_embed_form > .clearfix::before,
   .an-homepage-embed #can_embed_form > .clearfix::after { display: none !important; }
@@ -901,6 +916,11 @@
          false = show who the action is by. */
       hideSponsoredBy: true,
 
+      /* Sticky form column: on desktop, in the side-by-side layouts, the form
+         stays in view while the description scrolls past it. Only engages
+         while the form column fits on screen (see the module below). */
+      stickySidebar: true,
+
       /* Font stylesheet URL also loaded inside the fundraiser iframe so the
          donation form uses the brand font. Keep in sync with the <link> above. */
       fontUrl: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap",
@@ -957,6 +977,19 @@
         document.body.classList.add('anw-type-' + ANW.type());
         /* Single-column fundraisers get their own content width (CSS 3b). */
         if (ANW.stackFundraiserSidebar || ANW.hideFundraiserSidebar) document.body.classList.add('anw-fundraiser-narrow');
+
+        /* Sticky form column (CSS 12b): only while the form fits in the
+           window with room to spare - re-checked as the form renders,
+           grows (errors, opt-ins) and as the window resizes. */
+        if (ANW.stickySidebar !== false) {
+          var fits = function () {
+            var col = document.getElementById('can_sidebar');
+            document.body.classList.toggle('anw-sticky-on', !!col && col.offsetHeight + 48 <= window.innerHeight);
+            return false;
+          };
+          ANW.watch(fits);
+          window.addEventListener('resize', fits);
+        }
       });
     })();
   </script>
