@@ -1213,8 +1213,11 @@
       /* Only let ordinary links through - never javascript: and friends. */
       function safeUrl(u) {
         u = String(u || '').replace(/^\s+/, '');
-        return /^(https?:|mailto:|tel:|\/|#)/i.test(u) ? u : '#';
+        return /^(https?:|mailto:|tel:|sms:|\/|#)/i.test(u) ? u : '#';
       }
+      /* Email / phone / text-message links hand off to an app - opening them
+         in a new tab would just leave a blank tab behind. */
+      function isAppLink(u) { return /^(mailto:|tel:|sms:)/i.test(String(u || '')); }
 
       /* REFERRAL TRACKING - every link the chain sends people along is tagged
          with where it came from, so it shows in reports:
@@ -1282,7 +1285,7 @@
           el.href = kind === 'share'
             ? shareHref(b.net, b.message, document.title, actionUrl('daisychain-share-' + b.net))
             : outboundUrl(safeUrl(b.url), b.label);
-          if (kind === 'share' || b.newTab !== false) { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
+          if (kind === 'share' || (b.newTab !== false && !isAppLink(el.getAttribute('href')))) { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
         } else {
           el = doc.createElement('button');
           el.type = 'button';
@@ -1316,7 +1319,7 @@
             for (var i = 0; i < links.length; i++) {
               var a = links[i];
               a.setAttribute('href', outboundUrl(safeUrl(a.getAttribute('href')), a.textContent));
-              if (CHAIN.textLinksNewTab !== false) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+              if (CHAIN.textLinksNewTab !== false && !isAppLink(a.getAttribute('href'))) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
               else { a.removeAttribute('target'); }
             }
             wrap.appendChild(t);
