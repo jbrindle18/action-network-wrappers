@@ -2448,7 +2448,7 @@ function dcBlockBody(b){
       "Or drag from this button’s ● on the canvas to a page.");
   } else if(b.action==="url"){
     h += dcFld("Link address", '<input class="inp" type="text" data-dc="btnUrl" value="'+esc(b.url||"")+'" placeholder="https://">',
-      "A web address, or mailto:, tel: or sms: (e.g. sms:8864?body=FILIA). Web links get tracking tags saying they came from this thank-you page.")+dcTabField("btnNewTab", b.newTab, "Opens in");
+      "A web address, or mailto:, tel: or sms:. Web links get tracking tags saying they came from this thank-you page.")+dcTabField("btnNewTab", b.newTab, "Opens in");
   } else if(b.action==="share"){
     h += dcFld("Network", '<select class="inp" data-dc="btnNet">'+
       SHARE_NETS.filter(function(n){ return n!=="copy"; }).map(function(n){ return dcOpt(n, DC_NET_LABEL[n], b.net); }).join("")+'</select>')+
