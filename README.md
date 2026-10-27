@@ -238,6 +238,10 @@ window.ANW = {
   CSS: `display:contents` dissolves AN's two column boxes (`#can_main_col`,
   `#can_sidebar`) so `order` can interleave their children. "Hide the
   description sidebar" wins if both are on.
+- **Footer at the bottom** *(always on)* — on AN the header, content and footer
+  sit directly under `<body>`; the body is a flex column at least one screen
+  tall (`100vh` / `100dvh`) and the content area grows to fill it, so short
+  pages (a brief thank-you, a small form) keep the footer at the bottom.
 - **Sticky form column** *(toggle, ships ON)* — on desktop (768px+), in the
   side-by-side layouts, `#can_sidebar` is `position: sticky; top: 24px`, so the
   form stays in view while a long description scrolls past. The CSS keys off

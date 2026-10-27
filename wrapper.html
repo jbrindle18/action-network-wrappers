@@ -146,6 +146,13 @@
      scrollbar's width - without this, that overshoot forces a permanent
      horizontal scrollbar on pages tall enough to show one. */
   body.gen_body.an-homepage-embed { margin: 0; color: var(--body); overflow-x: hidden; }
+  /* Footer at the bottom of short pages (a brief thank-you, a small form):
+     the page is at least one screen tall, and the content area - header,
+     content and footer sit directly under <body> on AN - grows to fill the
+     spare space. Tall pages are unchanged. margin 0 auto, not auto: in a
+     flex column, auto top/bottom margins would centre the content instead. */
+  body.gen_body.an-homepage-embed { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+  body.gen_body.an-homepage-embed > .gen_wrapper { flex: 1 0 auto; margin: 0 auto; }
   body.an-homepage-embed:not(.gen_body) { background-color: var(--card-bg) !important; margin: 0; }
 
   .an-homepage-embed h1,
