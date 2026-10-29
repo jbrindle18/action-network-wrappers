@@ -207,6 +207,15 @@
     max-width: var(--logo-max-width);
     width: auto; height: auto;
   }
+  /* An SVG saved without width/height (just a viewBox) has no size of its
+     own, so width/height auto collapse it to 0x0 and the logo vanishes. Give
+     SVGs the max height and let the viewBox set the width; contain keeps a
+     logo that hits the max width in proportion. PNG/JPG logos keep their own
+     size, so small ones aren't blown up. */
+  .an-homepage-embed #gen_header img[src*=".svg"] {
+    height: var(--logo-max-height);
+    object-fit: contain; object-position: left center;
+  }
   .an-homepage-embed .gen_name { margin: 0; color: var(--body); }
 
   /* 3. PAGE WRAPPER */
@@ -864,9 +873,9 @@
   .an-homepage-embed .anw-chain__img { display: block; max-width: 100%; height: auto; margin-left: auto; margin-right: auto; border-radius: var(--card-radius); }
   .an-homepage-embed .anw-chain .anw-chain-btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    width: auto; height: auto; margin: 0; padding: 12px 22px; box-sizing: border-box;
+    width: auto; height: auto; margin: 0; padding: .8em 1.5em; box-sizing: border-box;
     border: 2px solid transparent; border-radius: var(--button-radius);
-    font-family: var(--font-body); font-size: calc(var(--text-size, 16px) * 0.9375); font-weight: 700; line-height: 1.2;
+    font-family: var(--font-body); font-size: calc(var(--text-size, 16px) * 1.125); font-weight: 700; line-height: 1.2;
     text-transform: var(--button-transform); letter-spacing: .4px;
     text-decoration: none !important; cursor: pointer;
     -webkit-appearance: none; appearance: none;
@@ -897,6 +906,23 @@
   /* ANW_CHAIN.hideThankYouText - the chain replaces AN's own thank-you copy. */
   .an-homepage-embed #can_thank_you.anw-chain-only > *:not(.anw-chain) { display: none !important; }
   .an-homepage-embed #can_thank_you.anw-chain-only > .anw-chain { margin-top: 0; }
+
+  /* Thank-you page text. AN's whitelabel CSS sets every thank-you <p> to
+     16px with a tight 1.2 line height, and styles every h3 in the form as a
+     section header (23px, 3px grey underline, big margins) - both on IDs, so
+     they outrank the rules above. Put the theme's text size back, and make
+     the daisy chain's headings plain headings. */
+  .an-homepage-embed #can_embed_form #can_thank_you p { font-size: inherit; line-height: 1.5; }
+  .an-homepage-embed #can_embed_form .anw-chain__text h3 {
+    font-size: calc(var(--text-size, 16px) * 1.375); line-height: 1.3;
+    margin: 0 0 10px; padding: 0; border: 0;
+  }
+  /* A thank-you message is short - a full-width card leaves long, hard-to-
+     read lines. Cap it at a comfortable reading width that grows with the
+     text size (720px at 16px), centred. */
+  .an-homepage-embed .gen_wrapper #can_embed_form.can_thank_you_wrap {
+    max-width: calc(var(--text-size, 16px) * 45); margin-left: auto; margin-right: auto;
+  }
 
   </style>
 
