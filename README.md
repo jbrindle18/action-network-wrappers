@@ -64,7 +64,9 @@ is UTF-8-safe (handles £, em-dashes, etc.).
    layout, modules, thank-you pages, footer) and applies them onto the
    **latest** template — so you keep every later fix/feature instead of
    resurrecting the old file. Renamed tokens are migrated automatically (e.g.
-   an old single brand colour fans out to the new button / accent colours).
+   an old single brand colour fans out to the new button / accent colours; a
+   file saved before the title / progress colours existed gives them its Accent,
+   and one without a text size gets the 16px default, so it looks as it did).
 4. The **⋯** menu has How it works and Reset to defaults.
 
 Always check the result in AN's own page-wrapper **Preview** before going live.
@@ -151,13 +153,15 @@ Everything tweakable is searchable by the keyword **`CONFIG`**.
 
 ### Colours
 Edit **Section 0 (THEME TOKENS)** at the top of `<style id="anw-embed-css">`.
-Default palette is green. The colour system is deliberately small — 10 tokens
+Default palette is green. The colour system is deliberately small — 12 tokens
 cover the whole theme:
 
 | Token | Controls |
 |-------|----------|
 | `--body` | Body text **and** headings |
-| `--accent` | Entry-title heading, progress bar + running total, links, required-field mark, input focus outline |
+| `--accent` | Links, required-field mark, input focus outline, quote bar, ticked boxes |
+| `--title-color` | Entry-title heading. Starts as `--accent`; the tool keeps it following the Accent until it's set on its own |
+| `--progress-color` | Progress bar + running total (signatures / raised). Follows `--accent` the same way |
 | `--button-bg` | Action / submit button background |
 | `--button-text` | Action / submit button text |
 | `--input-border` | Input field border |
@@ -170,7 +174,7 @@ cover the whole theme:
 Everything else (button hover, divider lines, the form card's border, the
 quote-box accent bar and background, loading skeleton, shadow, placeholder
 and helper-text grey) is declared in **Section 0b (DERIVED / STANDARD)**
-right below Section 0 — either computed from the 10 tokens above via CSS
+right below Section 0 — either computed from the tokens above via CSS
 `color-mix()` (e.g. the divider is a lighter tint of `--accent`) or a fixed
 brand-neutral value. Section 0b is a deliberately separate `.an-homepage-embed
 { }` rule: the generator tool only parses the *first* such rule for editable
@@ -178,6 +182,10 @@ fields, so anything in Section 0b stays out of the UI on purpose — it's not
 meant to be set directly.
 
 ### Fonts
+`--text-size` (default `16px`) sets the body text size. Headings, labels,
+buttons, small print and the footer are multiples of it, so the whole page
+scales together (Fonts → Body → Text size in the tool).
+
 Set the families in `--font-body` / `--font-heading`, then load them one of two
 ways:
 
@@ -244,10 +252,15 @@ window.ANW = {
   pages (a brief thank-you, a small form) keep the footer at the bottom.
 - **Sticky form column** *(toggle, ships ON)* — on desktop (768px+), in the
   side-by-side layouts, `#can_sidebar` is `position: sticky; top: 24px`, so the
-  form stays in view while a long description scrolls past. The CSS keys off
-  an `anw-sticky-on` body class that a small check only sets while the form
-  column fits in the window (re-checked as the form renders and on resize), so
-  a long form never has its submit button stuck below the screen.
+  form stays in view while a long description scrolls past. A form taller
+  than the window holds by one edge: scrolling down it travels with the page
+  until its bottom edge is 24px above the bottom of the screen, then holds;
+  scrolling up it travels back until its top edge is 24px below the top, then
+  holds. A small script only steps in when the scroll direction changes (it
+  sets a top margin so the form carries on from where it is, plus the sticky
+  top for the bottom hold); the moving and holding is the browser's own sticky
+  positioning. It re-places the form when it changes size (errors, opt-ins,
+  the fundraiser iframe) and on resize. A form that fits just pins at the top.
 - **Fundraiser width** — with the sidebar stacked or hidden, fundraiser pages
   use `--fundraiser-max` (default 850px) instead of `--wrapper-max` for the
   content area. In the tool it appears under those two options only while one
